@@ -48,8 +48,8 @@ add_definitions(${IV_DEFINITIONS})
 include(configure)
 
 # Compile libraries
-#add_subdirectory(common)
-#add_subdirectory(dataHandler)
+add_subdirectory(iv/common)
+add_subdirectory(iv/dataHandler)
 
 # Compile test
 #add_subdirectory(test)
