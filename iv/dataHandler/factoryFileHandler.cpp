@@ -6,10 +6,13 @@ Notes:
 
  */
 
-#include <dataHandler/factoryFileHandler.h>
-#include <dataHandler/hdf5FileHandler.h>
+#include <iv/dataHandler/factoryFileHandler.h>
+#include <iv/dataHandler/hdf5FileHandler.h>
 
 namespace iv
+{
+
+namespace DataHandler
 {
 
 FileHandlerPtr  FactoryFileHandler::CreateFileHandler(
@@ -31,6 +34,8 @@ FileHandlerPtr  FactoryFileHandler::CreateFileHandler(
             std::cerr << "Unknown file type" << std::endl;
             return 0;
     }
+}
+
 }
 
 }

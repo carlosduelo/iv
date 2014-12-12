@@ -6,9 +6,12 @@ Notes:
 
  */
 
-#include <dataHandler/hdf5FileHandler.h>
+#include <iv/dataHandler/hdf5FileHandler.h>
 
 namespace iv
+{
+
+namespace DataHandler
 {
 
 bool HDF5FileHandler::init(
@@ -291,6 +294,8 @@ bool HDF5FileHandler::_readGrid( const std::string& name,
 	}
 
 	return true;
+}
+
 }
 
 }

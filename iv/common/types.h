@@ -36,6 +36,8 @@ typedef unsigned plane_id_t;
 /* indentifier type for node */
 typedef unsigned long long index_node_t;
 
+typedef uint32_t    level_t;
+
 typedef vmml::vector< 3 , int32_t > vec3int32_t;
 typedef vmml::vector< 2 , int32_t > vec2int32_t;
 

@@ -52,7 +52,7 @@ add_subdirectory(iv/common)
 add_subdirectory(iv/dataHandler)
 
 # Compile test
-#add_subdirectory(test)
+add_subdirectory(test)
 
 # Compile perf
 #add_subdirectory(perf)

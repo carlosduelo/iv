@@ -6,9 +6,15 @@ Notes:
 
  */
 
-#include <dataHandler/fileHandler.h>
+#ifndef _IV_FACTORYFILEHANDLER
+#define _IV_FACTORYFILEHANDLER
+
+#include <iv/dataHandler/fileHandler.h>
 
 namespace iv
+{
+
+namespace DataHandler
 {
 
 /*
@@ -24,4 +30,9 @@ static FileHandlerPtr CreateFileHandler(
                                         const file_type_t  type,
                                         const file_args_t& file_params );
 };
+
 }
+
+}
+
+#endif // _IV_FACTORYFILEHANDLER

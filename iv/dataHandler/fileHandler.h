@@ -9,9 +9,12 @@ Notes:
 #ifndef _IV_FILEHANDLER_H_
 #define _IV_FILEHANDLER_H_
 
-#include <common/types.h>
+#include <iv/common/types.h>
 
 namespace iv
+{
+
+namespace DataHandler
 {
 
 class FactoryFileHandler;
@@ -73,6 +76,8 @@ private:
 };
 
 typedef std::unique_ptr< FileHandler, FileHandler::FileCloser > FileHandlerPtr;
+}
+
 }
 
 #endif // _IV_FILEHANDLER_H_

@@ -9,11 +9,14 @@ Notes:
 #ifndef _IV_HDF5FILEHANDLER_H_
 #define _IV_HDF5FILEHANDLER_H_
 
-#include <dataHandler/fileHandler.h>
+#include <iv/dataHandler/fileHandler.h>
 
 #include <hdf5.h>
 
 namespace iv
+{
+
+namespace DataHandler
 {
 
 class  HDF5FileHandler : public FileHandler
@@ -71,6 +74,8 @@ private:
                     float * const grid,
                     const hsize_t dim );
 };
+
+}
 
 }
 
