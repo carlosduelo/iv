@@ -9,6 +9,7 @@ Notes:
 #ifndef _IV_HDF5FILEHANDLER_H_
 #define _IV_HDF5FILEHANDLER_H_
 
+#include <iv/dataHandler/types.h>
 #include <iv/dataHandler/fileHandler.h>
 
 #include <hdf5.h>

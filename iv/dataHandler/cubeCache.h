@@ -9,9 +9,15 @@ Notes:
 #ifndef _IV_CUBECACHE_H_
 #define _IV_CUBECACHE_H_
 
+#include <iv/common/types.h>
+#include <iv/dataHandler/types.h>
 #include <iv/dataHandler/fileHandler.h>
+#include <iv/dataHandler/lruLinkedList.h>
+#include <iv/dataHandler/queue.hpp>
 
+#include <thread>
 #include <unordered_map>
+#include <queue>
 
 namespace iv
 {
@@ -19,46 +25,44 @@ namespace iv
 namespace DataHandler
 {
 
-struct CubeCacheAttr
-{
-    // File attributes
-    file_type_t file_type;
-    file_args_t file_args;
-
-    // Cache attributes
-    size_t       sizeCache; // Capacity in bytes
-    vec3int32_t  offset;
-    vec2int32_t  planeDimension;
-
-    level_t nLevels;
-
-    // Cube properties
-    level_t cubeLevel;
-    uint32_t cubeInc;
-    uint32_t cubeDim; // 2^( nLevels - cubeLevel )
-
-};
-
-typedef std::shared_ptr< CubeCacheAttr > CubeCacheAttrPtr;
-
 class CubeCache
 {
 public:
-    bool init( const CubeCacheAttrPtr& attr );
+    CubeCache() : _stopped( true ) {}
+
+    bool init( const CacheAttrPtr& attr );
 
     void stop();
 
-    float * get( const index_node_t id );
-
-    void remove( const index_node_t id );
+    const ObjectHandlerPtr get( const index_node_t id );
 
 private:
-    CubeCacheAttrPtr    _attr;
+    typedef std::unique_ptr< std::thread >                      threadPtr;
+    typedef std::unordered_map< index_node_t, CacheObjectPtr >  table_t;
 
-    FileHandlerPtr      _file;
+    bool _stopped;
+    std::mutex  _mutex;
 
-    float *             _data;
+    CacheAttrPtr    _attr;
+    FileHandlerPtr  _file;
 
+    std::unique_ptr< float[] >  _data;
+    std::unique_ptr< float[] >  _bufferPlane;
+
+    LRULinkedListPtr    _lruList;
+
+    table_t                     _cubesTable;
+
+    threadPtr                   _toReadThread;
+    Queue< CacheObjectPtr >     _toRead;
+
+    bool _unlock( CacheObject* o );
+
+    bool _lock( CacheObject* o );
+
+    void _updateToRead();
+
+    void _readProcess();
 };
 
 }

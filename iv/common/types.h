@@ -16,23 +16,6 @@ Notes:
 namespace iv
 {
 
-/*
- * DataHandler
- */
-
-// File types supported
-#define IV_FILE_TYPE_UNKNOWN    0
-#define IV_FILE_TYPE_HDF5       1
-
-typedef unsigned file_type_t;
-typedef std::vector< std::string > file_args_t;
-
-typedef unsigned plane_id_t;
-
-/*
- * Other
- */
-
 /* indentifier type for node */
 typedef unsigned long long index_node_t;
 

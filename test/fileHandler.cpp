@@ -7,6 +7,7 @@ Notes:
  */
 
 #include <iv/common/types.h>
+#include <iv/dataHandler/types.h>
 #include <iv/dataHandler/factoryFileHandler.h>
 
 #include <boost/program_options.hpp>

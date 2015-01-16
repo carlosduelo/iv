@@ -8,7 +8,7 @@
 # Test fileHandler
 add_executable( testFileHandler fileHandler.cpp )
 target_link_libraries( testFileHandler
-                                IVdataHandler
+                                IV
                                 ${HDF5_HL_LIBRARIES}
                                 ${Boost_LIBRARIES}
                                 )
@@ -16,5 +16,11 @@ target_link_libraries( testFileHandler
 # Test Priority LinkedList
 add_executable( testLRULinkedList lruLinkedList.cpp )
 target_link_libraries( testLRULinkedList
-                                IVdataHandler
-                                pthread)
+                                IV
+                                )
+
+# Test Cube Cache
+add_executable( testCubeCache cubeCache.cpp )
+target_link_libraries( testCubeCache
+                                IV
+                                )

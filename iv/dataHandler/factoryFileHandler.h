@@ -9,6 +9,7 @@ Notes:
 #ifndef _IV_FACTORYFILEHANDLER
 #define _IV_FACTORYFILEHANDLER
 
+#include <iv/dataHandler/types.h>
 #include <iv/dataHandler/fileHandler.h>
 
 namespace iv

@@ -14,45 +14,85 @@ namespace iv
 namespace DataHandler
 {
 
-class LRULinkedList::NodeList : public CacheEntry
+class LRULinkedList::NodeList
 {
 public:
     NodeList( const float*  e)
-        : CacheEntry( e )
+        : _element( e )
         , _free( true )
     {
     }
+
+    const float *   _element;
     bool            _free;
     iv::DataHandler::LRULinkedList::node_ptr        _next;
     iv::DataHandler::LRULinkedList::node_wptr       _previus;
-    iv::DataHandler::LRULinkedList::node_wptr       _oneself;
 };
 
-LRULinkedList::~LRULinkedList()
+
+LRULinkedList::NodeRef::NodeRef( const node_wptr n, const index_node_t id )
+    : _ptr( n )
+    , _id( id )
 {
 }
 
-bool LRULinkedList::init( const float* data, const uint32_t sizeElement )
+LRULinkedList::NodeRef::NodeRef( const index_node_t id )
+    : _id( id )
 {
+}
+
+LRULinkedList::NodeRef::NodeRef( )
+    : _id( 0 )
+{
+}
+
+const float* LRULinkedList::NodeRef::get() const
+{
+    node_ptr n = _ptr.lock();
+    if( !n )
+        return 0;
+    return n->_element;
+}
+
+index_node_t LRULinkedList::NodeRef::getID() const
+{
+    return _id;
+}
+
+bool LRULinkedList::NodeRef::isValid() const
+{
+    return !_ptr.expired();
+}
+
+
+bool LRULinkedList::init( const uint32_t size, const float* data,
+                                                const uint32_t sizeElement )
+{
+    std::unique_lock< std::mutex > mlock( _mutex );
+
+    _size = size;
     _list.reset( new NodeList( data ) );
     node_ptr node = _list;
-    node->_oneself = _list;
     for( unsigned i = 1; i < _size; i++ )
     {
         node->_next.reset( new NodeList( data + i * sizeElement ) );
-        node->_oneself = node;
         node_ptr previus = node;
         node = node->_next;
         node->_previus = previus;
-        node->_oneself = node;
     }
     _lastElement = node;
+
+    _stopped = false;
 
     return true;
 }
 
 void LRULinkedList::stop( )
 {
+    std::unique_lock< std::mutex > mlock( _mutex );
+
+    _stopped = true;
+
     // Destroy starting for lastElment
     node_ptr n = _lastElement.lock();
     _lastElement.reset();
@@ -64,26 +104,48 @@ void LRULinkedList::stop( )
     _list.reset();
 }
 
-const CacheEntryPtr LRULinkedList::getEmpty( )
+void LRULinkedList::getEmptySync( node_ref& node )
 {
-    if( !_list->_free )
-        return CacheEntryPtr();
+    std::unique_lock< std::mutex > mlock( _mutex );
 
+    while( !_stopped && !_list->_free )
+        _cond.wait( mlock );
+
+    if( _stopped )
+        return;
+
+    _getEmpty( node );
+}
+
+void LRULinkedList::getEmpty( node_ref& node )
+{
+    std::unique_lock< std::mutex > mlock( _mutex );
+    if( !_list->_free || _stopped )
+        return;
+
+    _getEmpty( node );
+}
+
+void LRULinkedList::_getEmpty( node_ref& ref )
+{
     node_ptr node = _list;
     node->_free = false;
     _elementAccessed( node );
 
-    return node;
+    ref._ptr = node;
 }
 
-void LRULinkedList::remove( CacheEntryPtr& node )
+void LRULinkedList::remove( node_ref& ref )
 {
-    assert( node );
+    std::unique_lock< std::mutex > mlock( _mutex );
+    if( _stopped )
+        return;
 
-    NodeList * ptr = static_cast< NodeList* >( node.get() );
-    node = CacheEntryPtr();
-    node_ptr n = ptr->_oneself.lock();
-    assert( n );
+    node_ptr n = ref._ptr.lock();
+    ref._ptr.reset();
+    ref._id = 0;
+    if( !n )
+        return;
 
     if( !n->_next ) // Last Element
     {
@@ -112,15 +174,19 @@ void LRULinkedList::remove( CacheEntryPtr& node )
     // Firs Element do nothing
 
     n->_free = true;
+    mlock.unlock();
+    _cond.notify_one();
 }
 
-void LRULinkedList::elementAccesed( const CacheEntryPtr node )
+void LRULinkedList::elementAccesed( const node_ref& ref )
 {
-    assert( node );
+    std::unique_lock< std::mutex > mlock( _mutex );
+    if( _stopped )
+        return;
 
-    NodeList * ptr = static_cast< NodeList* >( node.get() );
-    node_ptr n = ptr->_oneself.lock();
-    assert( n );
+    node_ptr n = ref._ptr.lock();
+    if( !n )
+        return;
     _elementAccessed( n );
 }
 
