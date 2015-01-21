@@ -105,7 +105,7 @@ bool readAndCheck( const iv::DataHandler::FileHandlerPtr& file,
                           abs( end.y() - start.y() ) *
                           abs( end.z() - start.z() );
 
-    const float * read = new float[ size ];
+    float * const read = new float[ size ];
 
     // Reading
     file->read( read, start, end );

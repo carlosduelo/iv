@@ -20,11 +20,13 @@ public:
     NodeList( const float*  e)
         : _element( e )
         , _free( true )
+        , _id( 0 )
     {
     }
 
     const float *   _element;
     bool            _free;
+    index_node_t    _id;
     iv::DataHandler::LRULinkedList::node_ptr        _next;
     iv::DataHandler::LRULinkedList::node_wptr       _previus;
 };
@@ -104,7 +106,7 @@ void LRULinkedList::stop( )
     _list.reset();
 }
 
-void LRULinkedList::getEmptySync( node_ref& node )
+bool LRULinkedList::getEmptySync( node_ref& node )
 {
     std::unique_lock< std::mutex > mlock( _mutex );
 
@@ -112,27 +114,32 @@ void LRULinkedList::getEmptySync( node_ref& node )
         _cond.wait( mlock );
 
     if( _stopped )
-        return;
+        return false;
 
-    _getEmpty( node );
+    return _getEmpty( node );
 }
 
-void LRULinkedList::getEmpty( node_ref& node )
+bool LRULinkedList::getEmpty( node_ref& node )
 {
     std::unique_lock< std::mutex > mlock( _mutex );
     if( !_list->_free || _stopped )
-        return;
+        return false;
 
-    _getEmpty( node );
+    return _getEmpty( node );
 }
 
-void LRULinkedList::_getEmpty( node_ref& ref )
+bool LRULinkedList::_getEmpty( node_ref& ref )
 {
     node_ptr node = _list;
     node->_free = false;
     _elementAccessed( node );
 
     ref._ptr = node;
+    if( node->_id == ref.getID() )
+        return true;
+
+    node->_id = ref.getID();
+    return false;
 }
 
 void LRULinkedList::remove( node_ref& ref )

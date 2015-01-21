@@ -94,7 +94,7 @@ const float * HDF5FileHandler::getzGrid( ) const
     return _zGrid.get();
 }
 
-void HDF5FileHandler::read( const float * data,
+void HDF5FileHandler::read( float * const data,
            const vec3int32_t& s,
            const vec3int32_t& e
          ) const
@@ -144,7 +144,8 @@ void HDF5FileHandler::read( const float * data,
 				           e.y() > ( int ) this->_dims[1] ?
                                 this->_dims[1] - offset[1] : e.y() - offset[1],
 				           e.z() > ( int ) this->_dims[2] ?
-                                this->_dims[2] - offset[2] : e.z() - offset[2]};
+                                this->_dims[2] - offset[2] : e.z() - offset[2]
+                          };
 
 	/*
 	* Define hyperslab in the dataset.

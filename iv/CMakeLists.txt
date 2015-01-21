@@ -11,10 +11,12 @@
 # SOURCES
 set(IV_SOURCES
     dataHandler/hdf5FileHandler.cpp
+    dataHandler/testFileHandler.cpp
     dataHandler/factoryFileHandler.cpp
     dataHandler/lruLinkedList.cpp
     dataHandler/objectHandler.cpp
     dataHandler/cacheObject.cpp
+    dataHandler/controlCache.cpp
     dataHandler/cubeCache.cpp
     )
 

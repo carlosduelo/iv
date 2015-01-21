@@ -15,7 +15,7 @@ Notes:
 iv::DataHandler::CubeCache      _cubeCache;
 iv::DataHandler::CacheAttrPtr   _attr;
 
-void test1()
+void test2()
 {
     const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( 2 );
     if( !obj )
@@ -27,7 +27,7 @@ void test1()
         std::cout << d << " " << d[0] <<std::endl;
 }
 
-void test2()
+void test3()
 {
     const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( 2 );
     if( !obj )
@@ -43,25 +43,18 @@ int main( int, char ** )
     _attr.reset( new iv::DataHandler::CacheAttr() );
 
     // Set attributes
+    _attr->file_type = IV_FILE_TYPE_TEST;
+    _attr->file_args.push_back( "100" );
     _attr->sizeCache = 100 * 1024 * 1024; // 100MB
     _attr->offset.set( 0, 0, 0 );
     _attr->nLevels = 9; // 2^9 = 512
     _attr->cubeLevel = 4;
     _attr->cubeInc = 2;
-    _attr->cubeDim = exp2f( _attr->nLevels - _attr->cubeLevel );
-    _attr->cubeSize = pow( _attr->cubeDim + 2 * _attr->cubeInc, 3 );
-
-    _cubeCache.init( _attr );
-    _cubeCache.stop();
+    _attr->compute();
 
     // TEST 1
     {
         _cubeCache.init( _attr );
-
-        std::thread _t( test1 );
-        for(int i=0; i<10000; i++);
-
-        _t.join();
         _cubeCache.stop();
     }
 
@@ -71,7 +64,35 @@ int main( int, char ** )
 
         std::thread _t( test2 );
 
+        _cubeCache.stop();
         _t.join();
+    }
+
+    // TEST 3
+    {
+        _cubeCache.init( _attr );
+
+        std::thread _t( test3 );
+
+        _t.join();
+        _cubeCache.stop();
+    }
+
+    // TEST 4
+    {
+        _cubeCache.init( _attr );
+
+        for( unsigned i = 0; i < 2; i++ )
+        {
+            const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( 3 );
+            if( !obj )
+                continue;
+
+            const float * d = obj->lock();
+            d = obj->lock();
+            if( d )
+                std::cout << d << " " << d[0] <<std::endl;
+        }
 
         _cubeCache.stop();
     }

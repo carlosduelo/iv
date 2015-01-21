@@ -8,6 +8,7 @@ Notes:
 
 #include <iv/dataHandler/factoryFileHandler.h>
 #include <iv/dataHandler/hdf5FileHandler.h>
+#include <iv/dataHandler/testFileHandler.h>
 
 namespace iv
 {
@@ -24,6 +25,15 @@ FileHandlerPtr  FactoryFileHandler::CreateFileHandler(
         case IV_FILE_TYPE_HDF5 :
         {
             FileHandlerPtr f( new HDF5FileHandler() );
+            if( f->init( file_params ) )
+                return f;
+
+            std::cerr << "Error opening file" << std::endl;
+            return 0;
+        }
+        case IV_FILE_TYPE_TEST :
+        {
+            FileHandlerPtr f( new TestFileHandler() );
             if( f->init( file_params ) )
                 return f;
 

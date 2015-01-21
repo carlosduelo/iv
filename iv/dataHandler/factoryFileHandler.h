@@ -22,6 +22,9 @@ namespace DataHandler
  * File Type = HDF5
  * file_params = file_name data_set_name [ xgrid  ygrid zgrid ]
  *
+ * File Type = TEST 
+ * file_params = dim
+ *
  */
 
 class FactoryFileHandler

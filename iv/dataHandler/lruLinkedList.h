@@ -58,9 +58,9 @@ public:
 
     void stop( );
 
-    void getEmptySync( node_ref& node );
+    bool getEmptySync( node_ref& node );
 
-    void getEmpty( node_ref& node );
+    bool getEmpty( node_ref& node );
 
     void remove( node_ref& ref );
 
@@ -79,7 +79,7 @@ private:
 
     void _elementAccessed( const node_wptr node );
 
-    void _getEmpty( node_ref& _ref );
+    bool _getEmpty( node_ref& _ref );
 };
 
 }

@@ -53,6 +53,7 @@ void ObjectHandler::_unlock()
 {
     if( !_locked )
         return;
+
     _obj->unlock();
     _locked = false;
 }

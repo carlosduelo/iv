@@ -40,7 +40,7 @@ public:
     virtual const float * getyGrid( ) const = 0;
     virtual const float * getzGrid( ) const = 0;
 
-    virtual void read( const float * data,
+    virtual void read( float * const data,
                        const vec3int32_t& start,
                        const vec3int32_t& end
                      ) const = 0;

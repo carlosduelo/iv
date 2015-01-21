@@ -37,6 +37,7 @@ public:
     index_node_t getID() const;
 
 private:
+    friend class ControlCache;
     friend class CubeCache;
 
     enum State { CACHED, NO_CACHED, READING };
