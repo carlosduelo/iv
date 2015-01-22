@@ -6,6 +6,7 @@ Notes:
 
  */
 
+#include <iv/common/mortonCodeUtil_CPU.h>
 #include <iv/dataHandler/cubeCache.h>
 #include <iv/dataHandler/cacheAttr.h>
 #include <iv/dataHandler/objectHandler.h>
@@ -17,7 +18,11 @@ iv::DataHandler::CacheAttrPtr   _attr;
 
 void test2()
 {
-    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( 2 );
+    iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
+                                                    _attr->cubeLevel,
+                                                    _attr->nLevels );
+
+    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( index );
     if( !obj )
         return;
     const float * d = obj->try_lock();
@@ -29,7 +34,11 @@ void test2()
 
 void test3()
 {
-    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( 2 );
+    iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
+                                                    _attr->cubeLevel,
+                                                    _attr->nLevels );
+
+    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( index );
     if( !obj )
         return;
     const float * d = obj->try_lock();
@@ -44,10 +53,10 @@ int main( int, char ** )
 
     // Set attributes
     _attr->file_type = IV_FILE_TYPE_TEST;
-    _attr->file_args.push_back( "100" );
+    _attr->file_args.push_back( "128" );
     _attr->sizeCache = 100 * 1024 * 1024; // 100MB
     _attr->offset.set( 0, 0, 0 );
-    _attr->nLevels = 9; // 2^9 = 512
+    _attr->nLevels = 7; // 2^9 = 128
     _attr->cubeLevel = 4;
     _attr->cubeInc = 2;
     _attr->compute();
@@ -81,10 +90,13 @@ int main( int, char ** )
     // TEST 4
     {
         _cubeCache.init( _attr );
+        iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
+                                                        _attr->cubeLevel,
+                                                        _attr->nLevels );
 
         for( unsigned i = 0; i < 2; i++ )
         {
-            const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( 3 );
+            const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( index );
             if( !obj )
                 continue;
 

@@ -55,6 +55,8 @@ private:
 
 protected:
     CacheAttrPtr    _attr;
+    vec3int32_t     _inc; // cube or brick inc
+    vec3int32_t     _dim; // cube or brick dimension 
 
     unsigned _numElements;
     float *  _data;

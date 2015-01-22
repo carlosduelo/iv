@@ -1,5 +1,5 @@
 /*
-Author: Carlos Duelo Serrano 
+Author: Carlos Duelo Serrano
 Company: Cesvima
 
 Notes:
@@ -9,9 +9,9 @@ Notes:
 #ifndef EQ_MIVT_MORTON_CPU_H
 #define EQ_MIVT_MORTON_CPU_H
 
-#include <common/types.h>
+#include <iv/common/types.h>
 
-namespace iv 
+namespace iv
 {
 
 inline index_node_t dilateInteger( index_node_t x )

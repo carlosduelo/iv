@@ -59,6 +59,7 @@ void ControlCache::stop()
             it->second->waitUnlocked( );
     }
 
+    _cubesTable.clear();
     _toReadThread->join();
     _lruList->stop();
 

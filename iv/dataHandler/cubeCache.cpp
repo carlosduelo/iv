@@ -8,6 +8,7 @@ Notes:
 
 #include <iv/dataHandler/cubeCache.h>
 
+#include <iv/common/mortonCodeUtil_CPU.h>
 #include <iv/dataHandler/cacheAttr.h>
 #include <iv/dataHandler/cacheObject.h>
 #include <iv/dataHandler/objectHandler.h>
@@ -49,6 +50,9 @@ bool CubeCache::_init()
         return false;
     }
 
+    _inc.set( _attr->cubeInc, _attr->cubeInc, _attr->cubeInc );
+    _dim.set( _attr->cubeDim, _attr->cubeDim, _attr->cubeDim );
+
     return true;
 }
 
@@ -63,8 +67,13 @@ void CubeCache::_stop()
 void CubeCache::_readProcess( const CacheObjectPtr& obj,
                               const LRULinkedList::node_ref data )
 {
-    float* d = (float*)data.get();
-    d[0] = obj->_id;
+    vec3int32_t start = getMinBoxIndex2( obj->getID(),
+                                        _attr->cubeLevel,
+                                        _attr->nLevels );
+    vec3int32_t end = start + _dim + _inc;
+    start += _inc;
+
+    _file->read( ( float* ) data.get(), start, end );
     obj->setState( CacheObject::CACHED );
 }
 
