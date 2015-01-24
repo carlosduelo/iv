@@ -39,10 +39,27 @@ public:
     uint32_t cubeDim;   // 2^( nLevels - cubeLevel )
     uint32_t cubeSize;  // 3^( cubeDim + 2 * cubeInc )
 
-    void compute()
+    // Brick properties
+    level_t brickLevel;
+    uint32_t brickInc;
+    uint32_t brickDim;   // 2^( nLevels - brickLevel )
+    uint32_t brickSize;  // 3^( brickDim + 2 * brickInc )
+
+    bool compute()
     {
+        if( cubeLevel > brickLevel )
+        {
+            std::cerr << "bricklevel may be greater than cubeLevel" << std::endl;
+            return false;
+        }
+
         cubeDim  = exp2f( nLevels - cubeLevel );
         cubeSize = powf( cubeDim + 2 * cubeInc, 3 );
+
+        brickDim  = exp2f( nLevels - brickLevel );
+        brickSize = powf( cubeDim + 2 * brickInc, 3 );
+
+        return true;
     }
 
 };

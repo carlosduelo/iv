@@ -59,7 +59,9 @@ int main( int, char ** )
     _attr->nLevels = 7; // 2^9 = 128
     _attr->cubeLevel = 4;
     _attr->cubeInc = 2;
-    _attr->compute();
+
+    if( !_attr->compute() )
+        return 0;
 
     // TEST 1
     {

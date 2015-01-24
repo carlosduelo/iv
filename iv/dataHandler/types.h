@@ -33,6 +33,7 @@ class CubeCache;
 class CacheObject;
 class LRULinkedList;
 class ObjectHandler;
+class Octree;
 
 typedef std::unique_ptr< Cache >            CachePtr;
 typedef std::shared_ptr< CacheAttr >        CacheAttrPtr;
@@ -40,6 +41,7 @@ typedef std::unique_ptr< CubeCache >        CubeCachePtr;
 typedef std::shared_ptr< CacheObject >      CacheObjectPtr;
 typedef std::unique_ptr< LRULinkedList >    LRULinkedListPtr;
 typedef std::shared_ptr< ObjectHandler >    ObjectHandlerPtr;
+typedef std::shared_ptr< Octree >           OctreePtr;
 
 }
 

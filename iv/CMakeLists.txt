@@ -18,6 +18,7 @@ set(IV_SOURCES
     dataHandler/cacheObject.cpp
     dataHandler/controlCache.cpp
     dataHandler/cubeCache.cpp
+    dataHandler/octreeConstructorMemory.cpp
     )
 
 # LIBRARIES

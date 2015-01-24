@@ -50,6 +50,9 @@ include(configure)
 # Compile libraries
 add_subdirectory(iv)
 
+# Compile Utils
+add_subdirectory(util)
+
 # Compile test
 add_subdirectory(test)
 
