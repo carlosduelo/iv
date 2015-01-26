@@ -10,7 +10,7 @@ Notes:
 #define _IV_FACTORYFILEHANDLER
 
 #include <iv/dataHandler/types.h>
-#include <iv/dataHandler/fileHandler.h>
+#include <iv/dataHandler/fileReader/fileHandler.h>
 
 namespace iv
 {
@@ -22,7 +22,7 @@ namespace DataHandler
  * File Type = HDF5
  * file_params = file_name data_set_name [ xgrid  ygrid zgrid ]
  *
- * File Type = TEST 
+ * File Type = TEST
  * file_params = dim
  *
  */

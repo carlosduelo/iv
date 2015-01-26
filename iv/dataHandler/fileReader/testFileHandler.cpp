@@ -6,7 +6,7 @@ Notes:
 
  */
 
-#include <iv/dataHandler/testFileHandler.h>
+#include <iv/dataHandler/fileReader/testFileHandler.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +28,7 @@ bool TestFileHandler::init(
     unsigned dim = 0;
     try
     {
-        int dims = atoi( file_params[0].c_str() ); 
+        int dims = atoi( file_params[0].c_str() );
         if( dims <= 0 )
             return false;
         dim = dims;
@@ -42,6 +42,9 @@ bool TestFileHandler::init(
     _realDimension.set( dim, dim, dim );
 
     _grid.reset( new float[ dim ] );
+    for( unsigned i = 0; i < dim; i++ )
+        _grid[i] = (float) i;
+
     _data.reset( new float[ dim * dim * dim ] );
     memset( _data.get(), 0, dim * dim * dim * sizeof( float ) );
 

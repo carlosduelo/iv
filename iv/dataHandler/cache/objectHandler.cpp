@@ -6,8 +6,8 @@ Notes:
 
  */
 
-#include <iv/dataHandler/objectHandler.h>
-#include <iv/dataHandler/cacheObject.h>
+#include <iv/dataHandler/cache/objectHandler.h>
+#include <iv/dataHandler/cache/cacheObject.h>
 
 namespace iv
 {

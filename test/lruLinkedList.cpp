@@ -7,7 +7,7 @@ Notes:
  */
 
 #include <iv/dataHandler/types.h>
-#include <iv/dataHandler/lruLinkedList.h>
+#include <iv/dataHandler/util/lruLinkedList.h>
 
 #include <iostream>
 #include <unordered_map>

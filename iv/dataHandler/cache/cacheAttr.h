@@ -23,6 +23,23 @@ namespace DataHandler
 class CacheAttr
 {
 public:
+    CacheAttr()
+        : file_type( IV_FILE_TYPE_UNKNOWN )
+        , sizeCache( 0 )
+        , offset( vec3int32_t( 0, 0, 0 ) )
+        , nLevels( 0 )
+        , cubeCacheImpl( IV_CUBE_CACHE_SIMPLE )
+        , cubeLevel( 0 )
+        , cubeInc( 0 )
+        , cubeDim( 0 )
+        , cubeSize( 0 )
+        , brickLevel( 0 )
+        , brickInc( 0 )
+        , brickDim( 0 )
+        , brickSize( 0 )
+    {
+    }
+
     // File attributes
     file_type_t file_type;
     file_args_t file_args;
@@ -34,6 +51,7 @@ public:
     level_t nLevels;
 
     // Cube properties
+    cube_cache_impl_t cubeCacheImpl;
     level_t cubeLevel;
     uint32_t cubeInc;
     uint32_t cubeDim;   // 2^( nLevels - cubeLevel )
@@ -47,7 +65,7 @@ public:
 
     bool compute()
     {
-        if( cubeLevel > brickLevel )
+        if( brickLevel > 0 && cubeLevel > brickLevel )
         {
             std::cerr << "bricklevel may be greater than cubeLevel" << std::endl;
             return false;

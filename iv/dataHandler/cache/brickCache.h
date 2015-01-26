@@ -6,11 +6,10 @@ Notes:
 
  */
 
-#ifndef _IV_CUBECACHE_H_
-#define _IV_CUBECACHE_H_
+#ifndef _IV_BRICKCACHE_H_
+#define _IV_BRICKCACHE_H_
 
-#include <iv/dataHandler/controlCache.h>
-#include <iv/dataHandler/fileHandler.h>
+#include <iv/dataHandler/cache/controlCache.h>
 
 namespace iv
 {
@@ -18,12 +17,10 @@ namespace iv
 namespace DataHandler
 {
 
-class CubeCache : public ControlCache
+class BrickCache : public ControlCache
 {
 private:
-    FileHandlerPtr  _file;
-
-    std::unique_ptr< float[] >  _bufferPlane;
+    ControlCachePtr _cubeCache;
 
     bool _init();
 
@@ -37,4 +34,5 @@ private:
 
 }
 
-#endif // _IV_CUBECACHE_H_
+#endif // _IV_BRICKCACHE_H_
+

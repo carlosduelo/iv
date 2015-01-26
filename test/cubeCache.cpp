@@ -7,13 +7,13 @@ Notes:
  */
 
 #include <iv/common/mortonCodeUtil_CPU.h>
-#include <iv/dataHandler/cubeCache.h>
-#include <iv/dataHandler/cacheAttr.h>
-#include <iv/dataHandler/objectHandler.h>
+#include <iv/dataHandler/cache/cacheAttr.h>
+#include <iv/dataHandler/cache/cache.h>
+#include <iv/dataHandler/cache/objectHandler.h>
 
 #include <thread>
 
-iv::DataHandler::CubeCache      _cubeCache;
+iv::DataHandler::CachePtr       _cubeCache;
 iv::DataHandler::CacheAttrPtr   _attr;
 
 void test2()
@@ -22,7 +22,7 @@ void test2()
                                                     _attr->cubeLevel,
                                                     _attr->nLevels );
 
-    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( index );
+    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
     if( !obj )
         return;
     const float * d = obj->try_lock();
@@ -38,7 +38,7 @@ void test3()
                                                     _attr->cubeLevel,
                                                     _attr->nLevels );
 
-    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( index );
+    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
     if( !obj )
         return;
     const float * d = obj->try_lock();
@@ -50,6 +50,7 @@ void test3()
 int main( int, char ** )
 {
     _attr.reset( new iv::DataHandler::CacheAttr() );
+    _cubeCache.reset( new iv::DataHandler::Cache( IV_CUBE_CACHE ) );
 
     // Set attributes
     _attr->file_type = IV_FILE_TYPE_TEST;
@@ -60,45 +61,42 @@ int main( int, char ** )
     _attr->cubeLevel = 4;
     _attr->cubeInc = 2;
 
-    if( !_attr->compute() )
-        return 0;
-
     // TEST 1
     {
-        _cubeCache.init( _attr );
-        _cubeCache.stop();
+        _cubeCache->init( _attr );
+        _cubeCache->stop();
     }
 
     // TEST 2
     {
-        _cubeCache.init( _attr );
+        _cubeCache->init( _attr );
 
         std::thread _t( test2 );
 
-        _cubeCache.stop();
+        _cubeCache->stop();
         _t.join();
     }
 
     // TEST 3
     {
-        _cubeCache.init( _attr );
+        _cubeCache->init( _attr );
 
         std::thread _t( test3 );
 
         _t.join();
-        _cubeCache.stop();
+        _cubeCache->stop();
     }
 
     // TEST 4
     {
-        _cubeCache.init( _attr );
+        _cubeCache->init( _attr );
         iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
                                                         _attr->cubeLevel,
                                                         _attr->nLevels );
 
         for( unsigned i = 0; i < 2; i++ )
         {
-            const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache.get( index );
+            const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
             if( !obj )
                 continue;
 
@@ -108,6 +106,6 @@ int main( int, char ** )
                 std::cout << d << " " << d[0] <<std::endl;
         }
 
-        _cubeCache.stop();
+        _cubeCache->stop();
     }
 }

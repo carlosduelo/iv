@@ -6,12 +6,12 @@ Notes:
 
  */
 
-#include <iv/dataHandler/cubeCache.h>
+#include <iv/dataHandler/cache/controlCache.h>
 
-#include <iv/dataHandler/cacheAttr.h>
-#include <iv/dataHandler/cacheObject.h>
-#include <iv/dataHandler/objectHandler.h>
-#include <iv/dataHandler/factoryFileHandler.h>
+#include <iv/dataHandler/cache/cacheAttr.h>
+#include <iv/dataHandler/cache/cacheObject.h>
+#include <iv/dataHandler/cache/objectHandler.h>
+#include <iv/dataHandler/fileReader/factoryFileHandler.h>
 
 using namespace std::placeholders;  // for _1, _2, _3...
 

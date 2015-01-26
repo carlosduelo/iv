@@ -10,15 +10,17 @@
 
 # SOURCES
 set(IV_SOURCES
-    dataHandler/hdf5FileHandler.cpp
-    dataHandler/testFileHandler.cpp
-    dataHandler/factoryFileHandler.cpp
-    dataHandler/lruLinkedList.cpp
-    dataHandler/objectHandler.cpp
-    dataHandler/cacheObject.cpp
-    dataHandler/controlCache.cpp
-    dataHandler/cubeCache.cpp
-    dataHandler/octreeConstructorMemory.cpp
+    dataHandler/fileReader/hdf5FileHandler.cpp
+    dataHandler/fileReader/testFileHandler.cpp
+    dataHandler/fileReader/factoryFileHandler.cpp
+    dataHandler/util/lruLinkedList.cpp
+    dataHandler/cache/objectHandler.cpp
+    dataHandler/cache/cacheObject.cpp
+    dataHandler/cache/controlCache.cpp
+    dataHandler/cache/cubeCacheSimple.cpp
+    dataHandler/cache/brickCache.cpp
+    dataHandler/cache/cache.cpp
+    dataHandler/octree/octreeConstructorMemory.cpp
     )
 
 # LIBRARIES

@@ -5,7 +5,7 @@
 # Notes: Using Builyard https://github.com/Eyescale/Buildyard
 #
 
-# Octree Constructor 
+# Octree Constructor
 add_executable( ivOC octreeConstructor.cpp )
 target_link_libraries( ivOC
                                 IV

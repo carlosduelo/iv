@@ -6,9 +6,9 @@ Notes:
 
  */
 
-#include <iv/dataHandler/factoryFileHandler.h>
-#include <iv/dataHandler/hdf5FileHandler.h>
-#include <iv/dataHandler/testFileHandler.h>
+#include <iv/dataHandler/fileReader/factoryFileHandler.h>
+#include <iv/dataHandler/fileReader/hdf5FileHandler.h>
+#include <iv/dataHandler/fileReader/testFileHandler.h>
 
 namespace iv
 {

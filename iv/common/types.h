@@ -23,6 +23,8 @@ typedef uint32_t    level_t;
 
 typedef vmml::vector< 3 , int32_t > vec3int32_t;
 typedef vmml::vector< 2 , int32_t > vec2int32_t;
+typedef vmml::vector< 2 , uint32_t > vec2uint32_t;
+typedef vmml::vector< 3 , uint32_t > vec3uint32_t;
 
 }
 

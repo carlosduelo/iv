@@ -11,8 +11,8 @@ Notes:
 
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
-#include <iv/dataHandler/lruLinkedList.h>
-#include <iv/dataHandler/queue.hpp>
+#include <iv/dataHandler/util/lruLinkedList.h>
+#include <iv/dataHandler/util/queue.hpp>
 
 #include <thread>
 #include <unordered_map>

@@ -6,7 +6,7 @@ Notes:
 
  */
 
-#include <iv/dataHandler/hdf5FileHandler.h>
+#include <iv/dataHandler/fileReader/hdf5FileHandler.h>
 
 namespace iv
 {

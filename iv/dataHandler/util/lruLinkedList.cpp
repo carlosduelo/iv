@@ -6,7 +6,7 @@ Notes:
 
  */
 
-#include <iv/dataHandler/lruLinkedList.h>
+#include <iv/dataHandler/util/lruLinkedList.h>
 
 namespace iv
 {

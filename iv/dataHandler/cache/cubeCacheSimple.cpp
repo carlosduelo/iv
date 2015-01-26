@@ -6,13 +6,13 @@ Notes:
 
  */
 
-#include <iv/dataHandler/cubeCache.h>
+#include <iv/dataHandler/cache/cubeCacheSimple.h>
 
 #include <iv/common/mortonCodeUtil_CPU.h>
-#include <iv/dataHandler/cacheAttr.h>
-#include <iv/dataHandler/cacheObject.h>
-#include <iv/dataHandler/objectHandler.h>
-#include <iv/dataHandler/factoryFileHandler.h>
+#include <iv/dataHandler/cache/cacheAttr.h>
+#include <iv/dataHandler/cache/cacheObject.h>
+#include <iv/dataHandler/cache/objectHandler.h>
+#include <iv/dataHandler/fileReader/factoryFileHandler.h>
 
 using namespace std::placeholders;  // for _1, _2, _3...
 
@@ -21,7 +21,7 @@ namespace iv
 
 namespace DataHandler
 {
-bool CubeCache::_init()
+bool CubeCacheSimple::_init()
 {
     _file =  FactoryFileHandler::CreateFileHandler( _attr->file_type,
                                                     _attr->file_args );
@@ -56,7 +56,7 @@ bool CubeCache::_init()
     return true;
 }
 
-void CubeCache::_stop()
+void CubeCacheSimple::_stop()
 {
     _file.reset();
     _attr.reset();
@@ -64,7 +64,7 @@ void CubeCache::_stop()
     _bufferPlane.reset();
 }
 
-void CubeCache::_readProcess( const CacheObjectPtr& obj,
+void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
                               const LRULinkedList::node_ref data )
 {
     vec3int32_t start = getMinBoxIndex2( obj->getID(),

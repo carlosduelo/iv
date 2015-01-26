@@ -10,7 +10,7 @@ Notes:
 #define _IV_TESTFILEHANDLER_H_
 
 #include <iv/dataHandler/types.h>
-#include <iv/dataHandler/fileHandler.h>
+#include <iv/dataHandler/fileReader/fileHandler.h>
 
 #include <hdf5.h>
 

@@ -24,12 +24,28 @@ namespace DataHandler
 #define IV_FILE_TYPE_HDF5       1
 #define IV_FILE_TYPE_TEST       2
 
-typedef unsigned                    file_type_t;
+// Cache
+#define IV_CUBE_CACHE 0
+#define IV_BRICK_CACHE 1
+
+// Cube Cache Implementations
+#define IV_CUBE_CACHE_SIMPLE 0
+
+// Octree types
+#define IV_OCTREE_SINGLE 0
+#define IV_OCTREE_MULTI  1
+
+typedef uint32_t                    file_type_t;
 typedef std::vector< std::string >  file_args_t;
+
+typedef uint32_t                    cache_type_t;
+typedef uint32_t                    cube_cache_impl_t;
+typedef uint32_t                    octree_type_t;
 
 class Cache;
 class CacheAttr;
 class CubeCache;
+class ControlCache;
 class CacheObject;
 class LRULinkedList;
 class ObjectHandler;
@@ -37,7 +53,7 @@ class Octree;
 
 typedef std::unique_ptr< Cache >            CachePtr;
 typedef std::shared_ptr< CacheAttr >        CacheAttrPtr;
-typedef std::unique_ptr< CubeCache >        CubeCachePtr;
+typedef std::unique_ptr< ControlCache >     ControlCachePtr;
 typedef std::shared_ptr< CacheObject >      CacheObjectPtr;
 typedef std::unique_ptr< LRULinkedList >    LRULinkedListPtr;
 typedef std::shared_ptr< ObjectHandler >    ObjectHandlerPtr;

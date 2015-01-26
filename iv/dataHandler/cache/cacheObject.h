@@ -11,7 +11,7 @@ Notes:
 
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
-#include <iv/dataHandler/lruLinkedList.h>
+#include <iv/dataHandler/util/lruLinkedList.h>
 
 #include <memory>
 #include <condition_variable>
@@ -38,7 +38,8 @@ public:
 
 private:
     friend class ControlCache;
-    friend class CubeCache;
+    friend class CubeCacheSimple;
+    friend class BrickCache;
 
     enum State { CACHED, NO_CACHED, READING };
     typedef std::function< bool ( CacheObject* ) > CacheObjectCallback_t;

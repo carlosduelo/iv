@@ -9,7 +9,7 @@ Notes:
 #ifndef _IV_OCTREE_CONSTRUCTOR_MEMORY_H_
 #define _IV_OCTREE_CONSTRUCTOR_MEMORY_H_
 
-#include <iv/dataHandler/octreeConstructor.h>
+#include <iv/dataHandler/octree/octreeConstructor.h>
 
 namespace iv
 {
