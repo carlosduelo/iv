@@ -43,13 +43,6 @@ bool CubeCacheSimple::_init()
         return false;
     }
 
-    _bufferPlane.reset( new float[ _attr->cubeDim + 2 * _attr->cubeInc ] );
-    if( !_bufferPlane )
-    {
-        std::cerr << "Not avaible space creating cube cache" << std::endl;
-        return false;
-    }
-
     _inc.set( _attr->cubeInc, _attr->cubeInc, _attr->cubeInc );
     _dim.set( _attr->cubeDim, _attr->cubeDim, _attr->cubeDim );
 
@@ -61,7 +54,6 @@ void CubeCacheSimple::_stop()
     _file.reset();
     _attr.reset();
     delete[] _data;
-    _bufferPlane.reset();
 }
 
 void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
@@ -71,7 +63,7 @@ void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
                                         _attr->cubeLevel,
                                         _attr->nLevels );
     vec3int32_t end = start + _dim + _inc;
-    start += _inc;
+    start -= _inc;
 
     _file->read( ( float* ) data.get(), start, end );
     obj->setState( CacheObject::CACHED );

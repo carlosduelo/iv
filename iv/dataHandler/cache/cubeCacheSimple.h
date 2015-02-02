@@ -23,8 +23,6 @@ class CubeCacheSimple : public ControlCache
 private:
     FileHandlerPtr  _file;
 
-    std::unique_ptr< float[] >  _bufferPlane;
-
     bool _init();
 
     void _stop();
