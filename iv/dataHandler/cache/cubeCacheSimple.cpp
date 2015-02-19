@@ -29,7 +29,7 @@ bool CubeCacheSimple::_init()
         return false;
 
     // Allocate memory
-    _numElements = _attr->sizeCache /
+    _numElements = _attr->sizeCacheCPU /
                                     ( _attr->cubeSize * sizeof( float ) );
     if( _numElements == 0 )
     {
@@ -67,6 +67,26 @@ void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
 
     _file->read( ( float* ) data.get(), start, end );
     obj->setState( CacheObject::CACHED );
+}
+
+const vec3int32_t& CubeCacheSimple::getRealDimension() const
+{
+    return _file->getRealDimension();
+}
+
+const float * CubeCacheSimple::getGridX() const
+{
+    return _file->getxGrid();
+}
+
+const float * CubeCacheSimple::getGridY() const
+{
+    return _file->getyGrid();
+}
+
+const float * CubeCacheSimple::getGridZ() const
+{
+    return _file->getzGrid();
 }
 
 }

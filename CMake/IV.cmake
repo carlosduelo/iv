@@ -1,7 +1,7 @@
 
 
 set(IV_PACKAGE_VERSION 0.1)
-set(IV_DEPENDS  REQUIRED vmmlib HDF5 Boost)
+set(IV_DEPENDS  REQUIRED vmmlib HDF5 Boost CUDA)
 set(IV_HDF5_COMPONENTS "C HL")
 set(IV_PORT_DEPENDS boost)
 set(IV_BOOST_COMPONENTS "program_options")

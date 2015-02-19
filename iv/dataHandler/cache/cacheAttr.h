@@ -25,7 +25,8 @@ class CacheAttr
 public:
     CacheAttr()
         : file_type( IV_FILE_TYPE_UNKNOWN )
-        , sizeCache( 0 )
+        , sizeCacheCPU( 0 )
+        , sizeCacheGPU( 0 )
         , offset( vec3int32_t( 0, 0, 0 ) )
         , nLevels( 0 )
         , cubeCacheImpl( IV_CUBE_CACHE_SIMPLE )
@@ -37,6 +38,7 @@ public:
         , brickInc( 0 )
         , brickDim( 0 )
         , brickSize( 0 )
+        , deviceID( 0 )
     {
     }
 
@@ -45,7 +47,8 @@ public:
     file_args_t file_args;
 
     // Cache attributes
-    size_t       sizeCache; // Capacity in bytes
+    size_t       sizeCacheCPU; // Capacity in bytes
+    size_t       sizeCacheGPU; // Capacity in bytes
     vec3int32_t  offset;
 
     level_t nLevels;
@@ -62,6 +65,8 @@ public:
     uint32_t brickInc;
     uint32_t brickDim;   // 2^( nLevels - brickLevel )
     uint32_t brickSize;  // 3^( brickDim + 2 * brickInc )
+    int      deviceID;
+    
 
     bool compute()
     {

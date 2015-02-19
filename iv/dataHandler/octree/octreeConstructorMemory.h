@@ -20,10 +20,15 @@ namespace DataHandler
 class OctreeConstructorMemory : public OctreeConstructor
 {
 public:
-    virtual bool start( const file_type_t& file_type,
-                        const file_args_t& file_args);
+    OctreeConstructorMemory( const OctreeConstructorAttrPtr& octree,
+                             const level_t readLevel )
+           : OctreeConstructor( octree, readLevel )
+    {}
 
-    virtual void stop();
+    virtual bool start( const file_type_t& file_type,
+                        const file_args_t& file_args );
+
+    virtual const OctreePtr stop();
 
 private:
     std::vector< std::vector< index_node_t > >  _data;

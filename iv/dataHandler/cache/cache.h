@@ -34,6 +34,27 @@ public:
     const ObjectHandlerPtr get( const index_node_t id );
 
     cache_type_t getTypeCache() const { return _cacheType; }
+
+    // Data From Volume
+    const vec3int32_t& getRealDimension() const
+    {
+        return _cache->getRealDimension();
+    }
+
+    const float * getGridX() const
+    {
+        return _cache->getGridX();
+    }
+
+    const float * getGridY() const
+    {
+        return _cache->getGridX();
+    }
+
+    const float * getGridZ() const
+    {
+        return _cache->getGridX();
+    }
 private:
     ControlCachePtr     _cache;
     const cache_type_t  _cacheType;

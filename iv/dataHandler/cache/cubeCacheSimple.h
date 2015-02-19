@@ -20,6 +20,15 @@ namespace DataHandler
 
 class CubeCacheSimple : public ControlCache
 {
+public:
+    // Data From Volume
+    virtual const vec3int32_t& getRealDimension() const;
+
+    virtual const float * getGridX() const;
+
+    virtual const float * getGridY() const;
+
+    virtual const float * getGridZ() const;
 private:
     FileHandlerPtr  _file;
 

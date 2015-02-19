@@ -50,6 +50,9 @@ void ControlCache::stop()
 {
     {
         std::unique_lock< std::mutex > mlock( _mutex );
+        if( _stopped )
+            return;
+
         _stopped = true;
 
         // Wait for threads

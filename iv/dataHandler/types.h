@@ -35,6 +35,9 @@ namespace DataHandler
 #define IV_OCTREE_SINGLE 0
 #define IV_OCTREE_MULTI  1
 
+// Octree Constructor Implementations
+#define IV_OCTREE_CONSTRUCTOR_MEMORY 0
+
 typedef uint32_t                    file_type_t;
 typedef std::vector< std::string >  file_args_t;
 
@@ -49,6 +52,9 @@ class ControlCache;
 class CacheObject;
 class LRULinkedList;
 class ObjectHandler;
+
+class OctreeConstructorAttr;
+class OctreeConstructor;
 class Octree;
 
 typedef std::unique_ptr< Cache >            CachePtr;
@@ -57,7 +63,10 @@ typedef std::unique_ptr< ControlCache >     ControlCachePtr;
 typedef std::shared_ptr< CacheObject >      CacheObjectPtr;
 typedef std::unique_ptr< LRULinkedList >    LRULinkedListPtr;
 typedef std::shared_ptr< ObjectHandler >    ObjectHandlerPtr;
-typedef std::shared_ptr< Octree >           OctreePtr;
+
+typedef std::shared_ptr< Octree >                   OctreePtr;
+typedef std::shared_ptr< OctreeConstructorAttr >    OctreeConstructorAttrPtr;
+typedef std::shared_ptr< OctreeConstructor >        OctreeConstructorPtr;
 
 }
 

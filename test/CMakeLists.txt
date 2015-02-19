@@ -24,3 +24,8 @@ add_executable( testCubeCache cubeCache.cpp )
 target_link_libraries( testCubeCache
                                 IV
                                 )
+# Test Brick Cache
+add_executable( testBrickCache brickCache.cpp )
+target_link_libraries( testBrickCache
+                                IV
+                                )

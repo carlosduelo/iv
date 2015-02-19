@@ -11,7 +11,9 @@ Notes:
 
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
+#include <iv/dataHandler/cache/cacheAttr.h>
 #include <iv/dataHandler/octree/octree.h>
+#include <iv/dataHandler/octree/octreeConstructorAttr.h>
 
 namespace iv
 {
@@ -22,7 +24,7 @@ namespace DataHandler
 class OctreeConstructor
 {
 public:
-    OctreeConstructor( const OctreePtr& octree,
+    OctreeConstructor( const OctreeConstructorAttrPtr& octree,
                        const level_t readLevel )
                : _octree( octree )
                , _readLevel( readLevel )
@@ -32,14 +34,13 @@ public:
     virtual ~OctreeConstructor() {}
 
     virtual bool start( const file_type_t& file_type,
-                        const file_args_t& file_args) = 0;
+                        const file_args_t& file_args ) = 0;
 
-    virtual void stop() = 0;
+    virtual const OctreePtr stop() = 0;
 
 protected:
-    const OctreePtr _octree;
+    const OctreeConstructorAttrPtr _octree;
     const level_t   _readLevel;
-
 };
 
 }

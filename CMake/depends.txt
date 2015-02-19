@@ -1,1 +1,1 @@
-config.iv http://github.com/carlosduelo/config.iv.git master
+config.iv https://github.com/carlosduelo/config.iv master

@@ -36,6 +36,15 @@ public:
 
     const ObjectHandlerPtr get( const index_node_t id );
 
+    // Data From Volume
+    virtual const vec3int32_t& getRealDimension() const = 0;
+
+    virtual const float * getGridX() const = 0;
+
+    virtual const float * getGridY() const = 0;
+
+    virtual const float * getGridZ() const = 0;
+
 private:
     typedef std::unique_ptr< std::thread >  threadPtr;
 

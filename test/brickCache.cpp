@@ -13,7 +13,7 @@ Notes:
 
 #include <thread>
 
-iv::DataHandler::CachePtr       _cubeCache;
+iv::DataHandler::CachePtr       _brickCache;
 iv::DataHandler::CacheAttrPtr   _attr;
 
 void test2()
@@ -22,7 +22,7 @@ void test2()
                                                     _attr->cubeLevel,
                                                     _attr->nLevels );
 
-    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
+    const iv::DataHandler::ObjectHandlerPtr obj = _brickCache->get( index );
     if( !obj )
         return;
     const float * d = obj->try_lock();
@@ -38,65 +38,68 @@ void test3()
                                                     _attr->cubeLevel,
                                                     _attr->nLevels );
 
-    const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
+    const iv::DataHandler::ObjectHandlerPtr obj = _brickCache->get( index );
     if( !obj )
         return;
     const float * d = obj->try_lock();
-    std::cout << d << std::endl;
+    std::cout << "-- " << d << std::endl;
     d = obj->lock();
-    std::cout << d << " " << d[0] << std::endl;
+    std::cout << d << " " << std::endl;
 }
 
 int main( int, char ** )
 {
     _attr.reset( new iv::DataHandler::CacheAttr() );
-    _cubeCache.reset( new iv::DataHandler::Cache( IV_CUBE_CACHE ) );
+    _brickCache.reset( new iv::DataHandler::Cache( IV_BRICK_CACHE ) );
 
     // Set attributes
     _attr->file_type = IV_FILE_TYPE_TEST;
     _attr->file_args.push_back( "128" );
     _attr->sizeCacheCPU = 100 * 1024 * 1024; // 100MB
+    _attr->sizeCacheGPU = 100 * 1024 * 1024; // 100MB
     _attr->offset.set( 0, 0, 0 );
     _attr->nLevels = 7; // 2^9 = 128
-    _attr->cubeLevel = 4;
-    _attr->cubeInc = 2;
+    _attr->brickLevel = 4;
+    _attr->brickInc = 2;
+    _attr->deviceID = 0;
 
     // TEST 1
     {
-        _cubeCache->init( _attr );
-        _cubeCache->stop();
+        _brickCache->init( _attr );
+        _brickCache->stop();
     }
 
     // TEST 2
     {
-        _cubeCache->init( _attr );
+        _brickCache->init( _attr );
 
         std::thread _t( test2 );
 
-        _cubeCache->stop();
+        _brickCache->stop();
         _t.join();
     }
 
+
     // TEST 3
     {
-        _cubeCache->init( _attr );
+        _brickCache->init( _attr );
 
         std::thread _t( test3 );
 
         _t.join();
-        _cubeCache->stop();
+        _brickCache->stop();
     }
 
     // TEST 4
     {
-        _cubeCache->init( _attr );
+        _brickCache->init( _attr );
         iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
                                                         _attr->cubeLevel,
                                                         _attr->nLevels );
 
         for( unsigned i = 0; i < 2; i++ )
         {
-            const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
+            const iv::DataHandler::ObjectHandlerPtr obj = _brickCache->get( index );
             if( !obj )
                 continue;
 
@@ -106,6 +109,6 @@ int main( int, char ** )
                 std::cout << d << " " << d[0] <<std::endl;
         }
 
-        _cubeCache->stop();
+        _brickCache->stop();
     }
 }
