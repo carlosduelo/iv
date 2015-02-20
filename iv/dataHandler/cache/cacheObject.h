@@ -41,7 +41,7 @@ private:
     friend class CubeCacheSimple;
     friend class BrickCache;
 
-    enum State { CACHED, NO_CACHED, READING };
+    enum State { CACHED, NO_CACHED, READING, INVALID };
     typedef std::function< bool ( CacheObject* ) > CacheObjectCallback_t;
 
     CacheObject( const index_node_t id,

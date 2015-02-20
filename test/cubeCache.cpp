@@ -44,7 +44,8 @@ void test3()
     const float * d = obj->try_lock();
     std::cout << d << std::endl;
     d = obj->lock();
-    std::cout << d << " " << d[0] << std::endl;
+    if( d )
+        std::cout << d << " " << d[0] << std::endl;
 }
 
 int main( int, char ** )

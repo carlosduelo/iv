@@ -51,11 +51,7 @@ const float* ObjectHandler::lock()
 
 void ObjectHandler::_unlock()
 {
-    if( !_locked )
-        return;
-
     _obj->unlock();
-    _locked = false;
 }
 
 index_node_t ObjectHandler::getID() const

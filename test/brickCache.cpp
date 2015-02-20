@@ -19,7 +19,7 @@ iv::DataHandler::CacheAttrPtr   _attr;
 void test2()
 {
     iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
-                                                    _attr->cubeLevel,
+                                                    _attr->brickLevel,
                                                     _attr->nLevels );
 
     const iv::DataHandler::ObjectHandlerPtr obj = _brickCache->get( index );
@@ -35,7 +35,7 @@ void test2()
 void test3()
 {
     iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
-                                                    _attr->cubeLevel,
+                                                    _attr->brickLevel,
                                                     _attr->nLevels );
 
     const iv::DataHandler::ObjectHandlerPtr obj = _brickCache->get( index );
@@ -44,7 +44,8 @@ void test3()
     const float * d = obj->try_lock();
     std::cout << "-- " << d << std::endl;
     d = obj->lock();
-    std::cout << d << " " << std::endl;
+    if( d )
+        std::cout << d << " " << std::endl;
 }
 
 int main( int, char ** )
@@ -59,7 +60,9 @@ int main( int, char ** )
     _attr->sizeCacheGPU = 100 * 1024 * 1024; // 100MB
     _attr->offset.set( 0, 0, 0 );
     _attr->nLevels = 7; // 2^9 = 128
-    _attr->brickLevel = 4;
+    _attr->cubeLevel = 4;
+    _attr->cubeInc = 2;
+    _attr->brickLevel = 6;
     _attr->brickInc = 2;
     _attr->deviceID = 0;
 
@@ -97,7 +100,7 @@ int main( int, char ** )
     {
         _brickCache->init( _attr );
         iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
-                                                        _attr->cubeLevel,
+                                                        _attr->brickLevel,
                                                         _attr->nLevels );
 
         for( unsigned i = 0; i < 2; i++ )

@@ -16,15 +16,14 @@ Notes:
 namespace
 {
 
-#if 0
-void computeCube( const iv::index_node_t id,
-                  const float * cube,
-                  const iv::level_t readLevel,
-                  const iv::DataHandler::OctreeConstructorAttrPtr& octree )
+void computeCube( const iv::index_node_t ,//id,
+                  const float * ,//cube,
+                  const iv::level_t ,//readLevel,
+                  const iv::DataHandler::OctreeConstructorAttrPtr& )//octree )
 {
+    
 
 }
-#endif
 }
 
 namespace iv
@@ -85,8 +84,10 @@ bool OctreeConstructorMemory::start( const file_type_t& file_type,
                                                cache->getRealDimension().z() )
         {
             ObjectHandlerPtr o = cache->get( id );
-            o->lock();
+            const float* data = o->lock();
             std::cout << id << std::endl;
+            computeCube( id, data, _readLevel, _octree );
+            break;
         }
     }
 

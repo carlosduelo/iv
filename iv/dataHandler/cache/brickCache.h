@@ -26,10 +26,12 @@ class Reader
 {
 public:
     Reader( const ControlCachePtr& cubeCache,
+            const CacheAttrPtr&    attr,
             const CacheObjectPtr&  obj,
             const LRULinkedList::node_ref& data,
-            std::function< void ( const CacheObjectPtr& ) > callback)
+            std::function< void ( const CacheObjectPtr&, const bool ) > callback)
         : _cubeCache( cubeCache )
+        , _attr( attr )
         , _obj( obj )
         , _data( data )
         , _callback( callback )
@@ -37,13 +39,14 @@ public:
     }
 
     void start();
-    
+
 private:
     std::thread _reader;
     const ControlCachePtr&          _cubeCache;
+    const CacheAttrPtr&             _attr;
     const CacheObjectPtr            _obj;
-    const LRULinkedList::node_ref&  _data;
-    std::function< void ( const CacheObjectPtr& ) > _callback;
+    const LRULinkedList::node_ref   _data;
+    std::function< void ( const CacheObjectPtr&, const bool ) > _callback;
 
     void _read();
 };
@@ -62,7 +65,7 @@ public:
 
     virtual const float * getGridZ() const;
 private:
-    ControlCachePtr            _cubeCache;
+    ControlCachePtr                                 _cubeCache;
     std::mutex                                      _mutex;
     std::condition_variable                         _cond;
     std::unordered_map< index_node_t, ReaderPtr >   _readers;
@@ -74,7 +77,7 @@ private:
     void _readProcess( const CacheObjectPtr& obj,
                                const LRULinkedList::node_ref data );
 
-    void _finishRead( const CacheObjectPtr& obj );
+    void _finishRead( const CacheObjectPtr& obj, const bool valid );
 };
 
 }

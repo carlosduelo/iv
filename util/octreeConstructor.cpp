@@ -17,7 +17,7 @@ namespace util
 
 int createOctree( int /*argc*/, char ** /*argv*/ )
 {
-    unsigned octreeConstructorImpl = IV_OCTREE_CONSTRUCTOR_MEMORY; 
+    unsigned octreeConstructorImpl = IV_OCTREE_CONSTRUCTOR_MEMORY;
 
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
 
@@ -38,15 +38,17 @@ int createOctree( int /*argc*/, char ** /*argv*/ )
                                                           offset,
                                                           file_path,
                                                           isosurfaces ) );
-    
+
     DataHandler::OctreeConstructorPtr oc =
             DataHandler::CreateOctreeConstructor( octreeConstructorImpl,
                                                   attr,
-                                                  readLevel ); 
+                                                  readLevel );
 
     DataHandler::file_args_t args;
     args.push_back("256");
     oc->start(IV_FILE_TYPE_TEST, args);
+
+    oc->stop();
 
     return 0;
 }

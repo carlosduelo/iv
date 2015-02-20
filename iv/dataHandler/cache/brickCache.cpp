@@ -8,6 +8,8 @@ Notes:
 
 #include <iv/dataHandler/cache/brickCache.h>
 
+#include <iv/common/mortonCodeUtil_CPU.h>
+
 #include <iv/dataHandler/cache/cacheAttr.h>
 #include <iv/dataHandler/cache/cubeCacheFactory.h>
 #include <iv/dataHandler/cache/cacheObject.h>
@@ -32,10 +34,99 @@ void Reader::start()
 
 void Reader::_read()
 {
-    const ObjectHandlerPtr objData = _cubeCache->get( _obj->getID() );
-    objData->lock();
+    // Get cube from cube cache
+    index_node_t cubeID = _obj->getID() >> 3 * (_attr->brickLevel - _attr->cubeLevel);
+    const ObjectHandlerPtr objData = _cubeCache->get( cubeID );
+    const float* cubeData = objData->lock();
 
-    _callback( _obj );
+    if( !cubeData )
+    {
+        _callback( _obj, false );
+        return;
+    }
+    
+    //Create Cuda Stream
+    cudaStream_t stream;
+    if( cudaSuccess != cudaStreamCreate( &stream ) )
+    {
+        std::cerr << "Error creating cuda stream: "
+                  << cudaGetErrorString( cudaGetLastError() ) << std::endl;
+        _callback( _obj, false );
+        return;
+    }
+    // Copy brick
+    void * ptrData = (void*)_data.get();
+    if( !ptrData )
+    {
+        _callback( _obj, false );
+        return;
+    }
+
+    if( cudaMemsetAsync( ptrData, 0, _attr->brickSize, stream ) )
+    {
+        std::cerr << "Error init brick: "
+                  << cudaGetErrorString( cudaGetLastError() ) << std::endl;
+        _callback( _obj, false );
+        return;
+    }
+    vec3int32_t coord = getMinBoxIndex2( _obj->getID(),
+                                         _attr->brickLevel,
+                                         _attr->nLevels );
+    vec3int32_t coordC = getMinBoxIndex2( cubeID,
+                                          _attr->cubeLevel,
+                                          _attr->nLevels );
+
+    std::cout << _obj->getID()<<" brick "<<coord << std::endl;
+    std::cout << cubeID <<" cube "<<coordC << std::endl;
+    coord -= coordC;
+
+    int32_t dimCube  = _attr->cubeDim + 2 * _attr->cubeInc;
+    int32_t dimBrick = _attr->brickDim + 2 * _attr->brickInc;
+
+    cudaMemcpy3DParms myParms;
+    myParms.srcArray = 0;
+    myParms.dstArray = 0;
+    myParms.srcPtr = make_cudaPitchedPtr( (void*)cubeData,
+                                          dimCube*sizeof(float),
+                                          dimCube,
+                                          dimCube );
+    myParms.dstPtr = make_cudaPitchedPtr( (void*)ptrData,
+                                          dimBrick*sizeof(float),
+                                          dimBrick,
+                                          dimBrick ); 
+    myParms.extent = make_cudaExtent( dimBrick*sizeof(float),
+                                      dimBrick,
+                                      dimBrick );
+    myParms.dstPos = make_cudaPos( 0, 0, 0);
+    myParms.srcPos = make_cudaPos( coord.z()*sizeof(float),
+                                   coord.y(),
+                                   coord.x() );
+    myParms.kind = cudaMemcpyHostToDevice;
+
+    if (cudaSuccess != cudaMemcpy3DAsync( &myParms, stream ) )
+    {
+        std::cerr << "Error copy cuda stream: "
+                  << cudaGetErrorString( cudaGetLastError() ) << std::endl;
+        _callback( _obj, false );
+        return;
+    }
+
+    if( cudaSuccess != cudaStreamSynchronize ( stream ) )
+    {
+        std::cerr << "Error sync cuda stream: "
+                  << cudaGetErrorString( cudaGetLastError() ) << std::endl;
+        _callback( _obj, false );
+        return;
+    }
+    if( cudaSuccess != cudaStreamDestroy( stream ) )
+    {
+        std::cerr << "Error destroyin cuda stream: "
+                  << cudaGetErrorString( cudaGetLastError() ) << std::endl;
+        _callback( _obj, false );
+        return;
+    }
+
+    _callback( _obj, true );
 }
 
 bool BrickCache::_init()
@@ -100,17 +191,21 @@ void BrickCache::_readProcess( const CacheObjectPtr& obj,
     if( !reader )
     {
         reader = ReaderPtr( new Reader( _cubeCache,
+                                        _attr,
                                         obj,
                                         data,
                                         std::bind( &BrickCache::_finishRead,
-                                                   this, _1 ) ) );
+                                                   this, _1, _2 ) ) );
         reader->start();
     }
 }
 
-void BrickCache::_finishRead( const CacheObjectPtr& obj )
+void BrickCache::_finishRead( const CacheObjectPtr& obj, const bool valid )
 {
-    obj->setState( CacheObject::CACHED );
+    if( valid )
+        obj->setState( CacheObject::CACHED );
+    else
+        obj->setState( CacheObject::INVALID );
 
     std::unique_lock< std::mutex > mlock( _mutex );
     auto e = _readers.find( obj->getID() );

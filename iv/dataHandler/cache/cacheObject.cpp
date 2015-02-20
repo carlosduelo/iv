@@ -53,8 +53,11 @@ const float* CacheObject::lock()
 {
     std::unique_lock< std::mutex > mlock( _mutex );
 
-    while( !_data.isValid() && _state != CACHED )
+    while( !_data.isValid() && _state != CACHED  && _state != INVALID )
         _condState.wait( mlock );
+
+    if( _state == INVALID )
+        return 0;
 
     _lockCallback( this );
     return _data.get();
@@ -91,7 +94,7 @@ CacheObject::State CacheObject::getState()
 void CacheObject::setState( const State& state )
 {
     std::unique_lock< std::mutex > mlock( _mutex );
-    if( state == CACHED )
+    if( state == CACHED || state == INVALID )
         _condState.notify_all();
 
     _state = state;
