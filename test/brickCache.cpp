@@ -29,7 +29,7 @@ void test2()
     std::cout << d << std::endl;
     d = obj->lock();
     if( d )
-        std::cout << d << " " << d[0] <<std::endl;
+        std::cout << d << " " << std::endl;
 }
 
 void test3()
@@ -68,6 +68,7 @@ int main( int, char ** )
         _brickCache->init( _attr );
         _brickCache->stop();
     }
+    std::cout << "TEST 1 DONE "<< std::endl;
 
     // TEST 2
     {
@@ -78,6 +79,7 @@ int main( int, char ** )
         _brickCache->stop();
         _t.join();
     }
+    std::cout << "TEST 2 DONE "<< std::endl;
 
 
     // TEST 3
@@ -89,6 +91,7 @@ int main( int, char ** )
         _t.join();
         _brickCache->stop();
     }
+    std::cout << "TEST 3 DONE "<< std::endl;
 
     // TEST 4
     {
@@ -106,7 +109,7 @@ int main( int, char ** )
             const float * d = obj->lock();
             d = obj->lock();
             if( d )
-                std::cout << d << " " << d[0] <<std::endl;
+                std::cout << d << " " << std::endl;
         }
 
         _brickCache->stop();

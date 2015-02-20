@@ -28,7 +28,7 @@ public:
     Reader( const ControlCachePtr& cubeCache,
             const CacheObjectPtr&  obj,
             const LRULinkedList::node_ref& data,
-            std::function< void ( index_node_t ) > callback)
+            std::function< void ( const CacheObjectPtr& ) > callback)
         : _cubeCache( cubeCache )
         , _obj( obj )
         , _data( data )
@@ -37,15 +37,13 @@ public:
     }
 
     void start();
-
-    void join();
     
 private:
     std::thread _reader;
     const ControlCachePtr&          _cubeCache;
     const CacheObjectPtr            _obj;
     const LRULinkedList::node_ref&  _data;
-    std::function< void ( index_node_t ) > _callback;
+    std::function< void ( const CacheObjectPtr& ) > _callback;
 
     void _read();
 };
@@ -76,7 +74,7 @@ private:
     void _readProcess( const CacheObjectPtr& obj,
                                const LRULinkedList::node_ref data );
 
-    void _finishRead( const index_node_t id );
+    void _finishRead( const CacheObjectPtr& obj );
 };
 
 }

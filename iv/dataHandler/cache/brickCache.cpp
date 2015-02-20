@@ -27,22 +27,15 @@ namespace DataHandler
 void Reader::start()
 {
     _reader = std::thread( &Reader::_read, this );
-}
-
-void Reader::join()
-{
-    _reader.join();
+    _reader.detach();
 }
 
 void Reader::_read()
 {
-    std::cout << "HHHHHHHHHHHHH 1" << std::endl;
     const ObjectHandlerPtr objData = _cubeCache->get( _obj->getID() );
     objData->lock();
 
-    std::cout << "HHHHHHHHHHHHH" << std::endl;
-
-    _callback( _obj->getID() );
+    _callback( _obj );
 }
 
 bool BrickCache::_init()
@@ -106,7 +99,6 @@ void BrickCache::_readProcess( const CacheObjectPtr& obj,
 
     if( !reader )
     {
-    std::cout << "HHHHHHHHHHHHHHHH" << std::endl;
         reader = ReaderPtr( new Reader( _cubeCache,
                                         obj,
                                         data,
@@ -116,14 +108,14 @@ void BrickCache::_readProcess( const CacheObjectPtr& obj,
     }
 }
 
-void BrickCache::_finishRead( const index_node_t id )
+void BrickCache::_finishRead( const CacheObjectPtr& obj )
 {
+    obj->setState( CacheObject::CACHED );
+
     std::unique_lock< std::mutex > mlock( _mutex );
-    auto e = _readers.find( id );
+    auto e = _readers.find( obj->getID() );
 
     assert( e != _readers.end() );
-
-    e->second->join();
 
     _readers.erase( e );
 
