@@ -21,8 +21,10 @@ set(IV_SOURCES
     dataHandler/cache/cubeCacheSimple.cpp
     dataHandler/cache/brickCache.cpp
     dataHandler/cache/cache.cpp
-    dataHandler/octree/factoryOctreeConstructor.cpp
-    dataHandler/octree/octreeConstructorMemory.cpp
+    dataHandler/octree/worker.cpp
+    dataHandler/octree/workerCPU.cpp
+    dataHandler/octree/dataWarehouse.cpp
+    dataHandler/octree/octreeConstructor.cpp
     )
 
 # LIBRARIES

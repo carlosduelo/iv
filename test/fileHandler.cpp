@@ -134,13 +134,6 @@ bool readAndCheck( const iv::DataHandler::FileHandlerPtr& file,
                 if( cube[ posToIndex( i, j, k, dimx ) ] !=
                     read[ posToIndex( x, y, z, sizeRead ) ] )
                 {
-                    #if 0
-                    std::cout << x << " " << y << " " << z << " "
-                              << posToIndex( x, y, z, sizeRead ) << std::endl;
-
-                    std::cout << i << " " << j << " " << k << " "
-                              << posToIndex( i, j, k, dimx ) << std::endl;
-                    #endif
                     std::cerr << "Error reading not equal" << std::endl;
                     result = false;
                 }

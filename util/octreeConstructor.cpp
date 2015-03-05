@@ -7,7 +7,8 @@ Notes:
  */
 
 #include <iv/dataHandler/octree/octreeConstructorAttr.h>
-#include <iv/dataHandler/octree/factoryOctreeConstructor.h>
+#include <iv/dataHandler/octree/octreeConstructorStats.h>
+#include <iv/dataHandler/octree/octreeConstructor.h>
 
 namespace iv
 {
@@ -15,40 +16,57 @@ namespace iv
 namespace util
 {
 
-int createOctree( int /*argc*/, char ** /*argv*/ )
+int createOctree( int argc, char ** argv )
 {
-    unsigned octreeConstructorImpl = IV_OCTREE_CONSTRUCTOR_MEMORY;
+    uint32_t numThreads = 8;
 
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
 
-    level_t nLevels = 8;
+    level_t nLevels = 10;
     level_t level = 8;
-    level_t readLevel = 4;
+    level_t readLevel = 3;
+    level_t constructorLevel = 0;
+    uint32_t cubeInc = 2;
+    index_node_t cube = 1;
 
     vec3uint32_t offset( 0,0,0 );
     std::set< float > isosurfaces;
-    isosurfaces.insert( 0.3 );
+    isosurfaces.insert( 0.5 );
 
     std::string file_path;
 
     DataHandler::OctreeConstructorAttrPtr attr( new
                     DataHandler::OctreeConstructorAttr( octree_type,
-                                                          nLevels,
-                                                          level,
-                                                          offset,
-                                                          file_path,
-                                                          isosurfaces ) );
+                                                        numThreads,
+                                                        false,
+                                                        false,
+                                                        nLevels,
+                                                        level,
+                                                        readLevel,
+                                                        constructorLevel,
+                                                        cubeInc,
+                                                        offset,
+                                                        file_path,
+                                                        isosurfaces ) );
 
-    DataHandler::OctreeConstructorPtr oc =
-            DataHandler::CreateOctreeConstructor( octreeConstructorImpl,
-                                                  attr,
-                                                  readLevel );
+    DataHandler::OctreeConstructorPtr oc( new
+                    DataHandler::OctreeConstructor( attr, cube ) );
 
     DataHandler::file_args_t args;
-    args.push_back("256");
-    oc->start(IV_FILE_TYPE_TEST, args);
+    if( argc > 1 )
+    {
+        args.push_back( argv[1] );
+        args.push_back( argv[2] );
+        oc->compute( IV_FILE_TYPE_HDF5, args );
+    }
+    else
+    {
+        args.push_back("256");
+        oc->compute(IV_FILE_TYPE_TEST, args);
+    }
 
-    oc->stop();
+    const DataHandler::OctreeConstructorStats& stats = oc->getStats();
+    stats.print();
 
     return 0;
 }

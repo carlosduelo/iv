@@ -11,9 +11,13 @@ Notes:
 
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
-#include <iv/dataHandler/cache/cacheAttr.h>
-#include <iv/dataHandler/octree/octree.h>
+#include <iv/dataHandler/util/queue.hpp>
 #include <iv/dataHandler/octree/octreeConstructorAttr.h>
+#include <iv/dataHandler/octree/octreeConstructorStats.h>
+#include <iv/dataHandler/octree/worker.h>
+#include <iv/dataHandler/octree/dataWarehouse.h>
+
+#include <thread>
 
 namespace iv
 {
@@ -25,22 +29,30 @@ class OctreeConstructor
 {
 public:
     OctreeConstructor( const OctreeConstructorAttrPtr& octree,
-                       const level_t readLevel )
+                       const index_node_t cube )
                : _octree( octree )
-               , _readLevel( readLevel )
+               , _cube( cube )
     {
     }
 
     virtual ~OctreeConstructor() {}
 
-    virtual bool start( const file_type_t& file_type,
-                        const file_args_t& file_args ) = 0;
+    bool compute( const file_type_t& file_type,
+                          const file_args_t& file_args );
 
-    virtual const OctreePtr stop() = 0;
+    const OctreeConstructorStats& getStats() const
+    {
+        return _stats;
+    }
 
 protected:
-    const OctreeConstructorAttrPtr _octree;
-    const level_t   _readLevel;
+    const OctreeConstructorAttrPtr  _octree;
+    const index_node_t              _cube;
+
+    DataWarehousePtr                _dataWarehouse;
+    std::vector< WorkerPtr >        _workers;
+
+    OctreeConstructorStats          _stats; 
 };
 
 }
