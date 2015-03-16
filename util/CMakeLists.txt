@@ -11,4 +11,3 @@ target_link_libraries( ivOC
                                 IV
                                 ${Boost_LIBRARIES}
                                 )
-

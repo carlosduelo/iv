@@ -23,7 +23,7 @@ int createOctree( int argc, char ** argv )
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
 
     level_t nLevels = 10;
-    level_t level = 8;
+    level_t level = 10;
     level_t readLevel = 3;
     level_t constructorLevel = 0;
     uint32_t cubeInc = 2;
@@ -35,19 +35,21 @@ int createOctree( int argc, char ** argv )
 
     std::string file_path;
 
+    DataHandler::OctreeGenAttrPtr attrGen( new
+                    DataHandler::OctreeGenAttr( octree_type,
+                                                nLevels,
+                                                level,
+                                                readLevel,
+                                                constructorLevel,
+                                                cubeInc,
+                                                offset,
+                                                file_path,
+                                                isosurfaces ) );
     DataHandler::OctreeConstructorAttrPtr attr( new
-                    DataHandler::OctreeConstructorAttr( octree_type,
+                    DataHandler::OctreeConstructorAttr( attrGen,
                                                         numThreads,
                                                         false,
-                                                        false,
-                                                        nLevels,
-                                                        level,
-                                                        readLevel,
-                                                        constructorLevel,
-                                                        cubeInc,
-                                                        offset,
-                                                        file_path,
-                                                        isosurfaces ) );
+                                                        false ) );
 
     DataHandler::OctreeConstructorPtr oc( new
                     DataHandler::OctreeConstructor( attr, cube ) );

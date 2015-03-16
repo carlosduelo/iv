@@ -45,6 +45,11 @@ public:
         return _stats;
     }
 
+    const DataWarehousePtr getData() const
+    {
+        return _dataWarehouse;
+    }
+
 protected:
     const OctreeConstructorAttrPtr  _octree;
     const index_node_t              _cube;
@@ -52,7 +57,7 @@ protected:
     DataWarehousePtr                _dataWarehouse;
     std::vector< WorkerPtr >        _workers;
 
-    OctreeConstructorStats          _stats; 
+    OctreeConstructorStats          _stats;
 };
 
 }

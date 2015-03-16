@@ -12,6 +12,8 @@ Notes:
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
 
+#include <iv/dataHandler/octree/octreeGenAttr.h>
+
 #include <set>
 
 namespace iv
@@ -23,30 +25,21 @@ namespace DataHandler
 class OctreeConstructorAttr
 {
 public:
-    OctreeConstructorAttr( const octree_type_t octreeType,
+    OctreeConstructorAttr( const OctreeGenAttrPtr& attr,
                            const uint32_t numThreads,
                            const bool hyperThreading,
-                           const bool cuda,
-                           const level_t nLevels,
-                           const level_t level,
-                           const level_t readLevel,
-                           const level_t constructorLevel,
-                           const uint32_t cubeInc,
-                           const vec3int32_t& offset,
-                           const std::string& filePath,
-                           const std::set<float>& isosurfaces )
-           : _octreeType( octreeType )
+                           const bool cuda )
+           : _octreeType( attr->getOctreeType() )
            , _hyperThreading( hyperThreading )
            , _useCuda( cuda )
            , _numThreads( numThreads )
-           , _nLevels( nLevels )
-           , _level( level )
-           , _readLevel( readLevel )
-           , _constructorLevel( constructorLevel )
-           , _cubeInc( cubeInc )
-           , _isosurfaces( isosurfaces )
-           , _offset( offset )
-           , _filePath( filePath )
+           , _nLevels( attr->getnLevels() )
+           , _level( attr->getLevel() )
+           , _readLevel( attr->getReadLevel() )
+           , _constructorLevel( attr->getConstructorLevel() )
+           , _cubeInc( attr->getCubeInc() )
+           , _isosurfaces( attr->getIsosurfaces() )
+           , _offset( attr->getOffset() )
     {
     }
 
@@ -72,8 +65,6 @@ public:
 
     const vec3int32_t& getOffset() const { return _offset; }
 
-    const std::string& getFilePath() const { return _filePath; }
-
 private:
     const octree_type_t _octreeType;
     const bool          _hyperThreading;
@@ -90,8 +81,6 @@ private:
     const std::set<float> _isosurfaces;
 
     const vec3int32_t _offset;
-
-    const std::string _filePath;
 };
 
 }

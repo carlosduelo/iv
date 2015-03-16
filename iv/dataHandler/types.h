@@ -50,6 +50,7 @@ class CacheObject;
 class LRULinkedList;
 class ObjectHandler;
 
+class OctreeGenAttr;
 class OctreeConstructorAttr;
 class OctreeConstructor;
 class Worker;
@@ -64,6 +65,7 @@ typedef std::unique_ptr< LRULinkedList >    LRULinkedListPtr;
 typedef std::shared_ptr< ObjectHandler >    ObjectHandlerPtr;
 
 typedef std::shared_ptr< Octree >                   OctreePtr;
+typedef std::shared_ptr< OctreeGenAttr >            OctreeGenAttrPtr;
 typedef std::shared_ptr< OctreeConstructorAttr >    OctreeConstructorAttrPtr;
 typedef std::shared_ptr< OctreeConstructor >        OctreeConstructorPtr;
 typedef std::unique_ptr< Worker >                   WorkerPtr;

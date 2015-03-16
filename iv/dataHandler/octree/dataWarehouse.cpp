@@ -24,7 +24,6 @@ bool DataWarehouse::start()
     index_node_t current = _min;
     while( current < _max )
     {
-        std::cout << current << std::endl;
         _indices.push_back( current );
         _dimensions.push_back( 0 );
 
@@ -120,14 +119,15 @@ void DataWarehouse::_vectorToFile( std::ofstream&   file,
                                    const uint32_t dim )
 {
     index_node_t endRange = vector[0];
-    file.write( (char*) &endRange, sizeof( index_node_t ) );
+    index_node_t startRange = vector[0];
 
     for( uint32_t i = 1; i < dim; i++ )
     {
-        if( vector[i] > endRange )
+        if( vector[i] != endRange + 1 )
         {
+            file.write( (char*) &startRange, sizeof( index_node_t ) );
             file.write( (char*) &endRange, sizeof( index_node_t ) );
-            file.write( (char*) &vector[i], sizeof( index_node_t ) );
+            startRange = vector[i];
         }
         endRange = vector[i];
     }
