@@ -59,16 +59,20 @@ public:
     // Data From Volume
     virtual const vec3int32_t& getRealDimension() const;
 
-    virtual const float * getGridX() const;
-
-    virtual const float * getGridY() const;
-
-    virtual const float * getGridZ() const;
+    virtual const float * getGridX() const { return _xGrid; }
+                                                           
+    virtual const float * getGridY() const { return _yGrid; }
+                                                           
+    virtual const float * getGridZ() const { return _zGrid; }
 private:
     ControlCachePtr                                 _cubeCache;
     std::mutex                                      _mutex;
     std::condition_variable                         _cond;
     std::unordered_map< index_node_t, ReaderPtr >   _readers;
+    
+    float * _xGrid;
+    float * _yGrid;
+    float * _zGrid;
 
     bool _init();
 

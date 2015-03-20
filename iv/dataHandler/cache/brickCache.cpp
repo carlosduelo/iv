@@ -8,6 +8,7 @@ Notes:
 
 #include <iv/dataHandler/cache/brickCache.h>
 
+#include <iv/common/global.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/cache/cacheAttr.h>
@@ -44,7 +45,7 @@ void Reader::_read()
         _callback( _obj, false );
         return;
     }
-    
+
     //Create Cuda Stream
     cudaStream_t stream;
     if( cudaSuccess != cudaStreamCreate( &stream ) )
@@ -93,7 +94,7 @@ void Reader::_read()
     myParms.dstPtr = make_cudaPitchedPtr( (void*)ptrData,
                                           dimBrick*sizeof(float),
                                           dimBrick,
-                                          dimBrick ); 
+                                          dimBrick );
     myParms.extent = make_cudaExtent( dimBrick*sizeof(float),
                                       dimBrick,
                                       dimBrick );
@@ -143,20 +144,45 @@ bool BrickCache::_init()
         return false;
     }
 
+    const Global& global = Global::getGlobal();
     // Allocate memory
-    _numElements = _attr->sizeCacheGPU /
+    _numElements = global.getCacheSizeGPU() /
                                     ( _attr->brickSize * sizeof( float ) );
     if( _numElements == 0 )
     {
         std::cerr << "Not avaible space creating brick cache" << std::endl;
         return false;
     }
-    _data =  new float[ _numElements * _attr->brickSize ];
 
     if( cudaSuccess != cudaMalloc( &_data,
                           _numElements * _attr->brickSize *sizeof( float ) ) )
     {
         std::cerr << "Not avaible space creating brick cache" << std::endl;
+        return false;
+    }
+
+    // Allocate and Copy Grids
+    const vec3int32_t& dimension = _cubeCache->getRealDimension();
+    uint32_t sizeGrid = dimension.x() + dimension.y() + dimension.z();
+    if( cudaSuccess != cudaMalloc( &_xGrid, sizeGrid * sizeof( float ) ) )
+    {
+        std::cerr << "Not avaible space creating brick cache" << std::endl;
+        return false;
+    }
+    if( cudaSuccess != cudaMemcpy( _xGrid,
+                                  _cubeCache->getGridX(),
+                                  dimension.x()*sizeof(float),
+                                  cudaMemcpyHostToDevice)        &&
+        cudaSuccess != cudaMemcpy( _xGrid + dimension.x(),
+                                  _cubeCache->getGridY(),
+                                  dimension.y()*sizeof(float),
+                                  cudaMemcpyHostToDevice)        &&
+        cudaSuccess != cudaMemcpy( _xGrid + dimension.x() + dimension.y(),
+                                  _cubeCache->getGridZ(),
+                                  dimension.z()*sizeof(float),
+                                  cudaMemcpyHostToDevice)        )
+    {
+        std::cerr << "Error copying grids" << std::endl;
         return false;
     }
 
@@ -176,7 +202,8 @@ void BrickCache::_stop()
     // Stop Cube Cache
     _cubeCache->stop();
 
-    if( cudaSuccess != cudaFree( _data ) )
+    if( cudaSuccess != cudaFree( _data ) &&
+        cudaSuccess != cudaFree( _xGrid ) )
     {
         std::cerr << "Error free cuda memory" << std::endl;
     }
@@ -221,21 +248,6 @@ void BrickCache::_finishRead( const CacheObjectPtr& obj, const bool valid )
 const vec3int32_t& BrickCache::getRealDimension() const
 {
     return _cubeCache->getRealDimension();
-}
-
-const float * BrickCache::getGridX() const
-{
-    return _cubeCache->getGridX();
-}
-
-const float * BrickCache::getGridY() const
-{
-    return _cubeCache->getGridY();
-}
-
-const float * BrickCache::getGridZ() const
-{
-    return _cubeCache->getGridZ();
 }
 
 }

@@ -10,6 +10,8 @@
 
 # SOURCES
 set(IV_SOURCES
+    common/global.cpp
+    common/init.cpp
     dataHandler/fileReader/hdf5FileHandler.cpp
     dataHandler/fileReader/testFileHandler.cpp
     dataHandler/fileReader/factoryFileHandler.cpp
@@ -19,7 +21,6 @@ set(IV_SOURCES
     dataHandler/cache/controlCache.cpp
     dataHandler/cache/cubeCacheFactory.cpp
     dataHandler/cache/cubeCacheSimple.cpp
-    dataHandler/cache/brickCache.cpp
     dataHandler/cache/cache.cpp
     dataHandler/octree/worker.cpp
     dataHandler/octree/workerCPU.cpp
@@ -31,10 +32,19 @@ set(IV_SOURCES
 set(IV_LIBRARIES
     pthread
     ${HDF5_LIBRARIES}
-    ${CUDA_LIBRARIES}
     )
 
-include_directories( ${CUDA_INCLUDE_DIRS} )
+if(CUDA_FOUND)
+    list( APPEND IV_SOURCES
+                    dataHandler/cache/brickCache.cpp
+        )
+
+    list( APPEND IV_LIBRARIES
+                    ${CUDA_LIBRARIES}
+        )
+
+    include_directories( ${CUDA_INCLUDE_DIRS} )
+endif()
 
 #list(SORT IV_PUBLIC_HEADERS)
 list(SORT IV_SOURCES)

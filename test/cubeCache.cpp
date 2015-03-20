@@ -51,12 +51,11 @@ void test3()
 int main( int, char ** )
 {
     _attr.reset( new iv::DataHandler::CacheAttr() );
-    _cubeCache.reset( new iv::DataHandler::Cache( IV_CUBE_CACHE ) );
+    _cubeCache.reset( new iv::DataHandler::Cache( ) );
 
     // Set attributes
     _attr->file_type = IV_FILE_TYPE_TEST;
     _attr->file_args.push_back( "128" );
-    _attr->sizeCacheCPU = 100 * 1024 * 1024; // 100MB
     _attr->offset.set( 0, 0, 0 );
     _attr->nLevels = 7; // 2^9 = 128
     _attr->cubeLevel = 4;

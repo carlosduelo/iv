@@ -24,10 +24,6 @@ namespace DataHandler
 #define IV_FILE_TYPE_HDF5       1
 #define IV_FILE_TYPE_TEST       2
 
-// Cache
-#define IV_CUBE_CACHE 0
-#define IV_BRICK_CACHE 1
-
 // Cube Cache Implementations
 #define IV_CUBE_CACHE_SIMPLE 0
 

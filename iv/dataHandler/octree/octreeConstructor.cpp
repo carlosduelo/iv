@@ -6,6 +6,8 @@ Notes:
 
  */
 
+#include <iv/common/global.h>
+
 #include <iv/dataHandler/octree/octreeConstructor.h>
 #include <iv/dataHandler/octree/octreeConstructorStats.h>
 #include <iv/dataHandler/octree/workerCPU.h>
@@ -64,19 +66,12 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
     cacheAttr->file_type = file_type;
     cacheAttr->file_args = file_args;
 
-    cacheAttr->sizeCacheCPU = 1000 * 1024 * 1024; // 100MB
-    cacheAttr->sizeCacheGPU = 1000 * 1024 * 1024; // 100MB
-
     cacheAttr->offset = _octree->getOffset();
     cacheAttr->nLevels = _octree->getnLevels();
     cacheAttr->cubeLevel = _octree->getReadLevel();
     cacheAttr->cubeInc = _octree->getCubeInc();
 
-    CachePtr cache;
-    if( _octree->useCuda() )
-        cache.reset( new iv::DataHandler::Cache( IV_BRICK_CACHE ) );
-    else
-        cache.reset( new iv::DataHandler::Cache( IV_CUBE_CACHE ) );
+    CachePtr cache( new iv::DataHandler::Cache( ) );
 
     if( ! cache )
         return false;
@@ -106,8 +101,10 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
     if( !data.wasFine )
         return false;
 
+    const Global& global = Global::getGlobal();
+
     bool wasFine = true;
-    if( _octree->useHyperThreading () )
+    if( global.useHyperThreading() )
     {
         uint32_t worker = 0;
         for( index_node_t id = idStart; id <= idFinish; id++ )
@@ -124,7 +121,7 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
                     coordCubeStart.z() + _octree->getOffset().z() <
                     cache->getRealDimension().z() )
             {
-                if( _octree->useCuda() )
+                if( global.useCuda() )
                     _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                                   cache,
                                                                   _octree,
@@ -160,12 +157,12 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
             }
         }
 
-        uint32_t eachThread = numCubes / _octree->getNumThreads();
+        uint32_t eachThread = numCubes / global.getMaxNumThreads();
         index_node_t id = idStart;
         uint32_t worker = 0;
         while( id <= idFinish )
         {
-            if( _octree->useCuda() )
+            if( global.useCuda() )
                 _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                               cache,
                                                               _octree,

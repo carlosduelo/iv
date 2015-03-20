@@ -93,8 +93,13 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
     for( index_node_t i = idS; i < idE; i++ )
     {
         if( _computeCube( i, cube, dimCube, dimCubeData ) )
-            return;
+        {
             _data->pushCube( i );
+            // Update MaxHeight
+            vec3int32_t coord = getMinBoxIndex2( i, _attr->getLevel(),
+                                                    _attr->getnLevels() );
+            _data->updateMaxHeight( coord.y() );
+        }
     }
 }
 

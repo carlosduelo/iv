@@ -8,6 +8,8 @@ Notes:
 
 #include <iv/dataHandler/cache/cache.h>
 
+#include <iv/common/global.h>
+
 #include <iv/dataHandler/cache/cacheAttr.h>
 #include <iv/dataHandler/cache/cubeCacheFactory.h>
 #include <iv/dataHandler/cache/brickCache.h>
@@ -23,10 +25,13 @@ bool Cache::init( const CacheAttrPtr& attr )
     if( !attr->compute() )
         return false;
 
-    if( _cacheType == IV_CUBE_CACHE )
+    const Global& global = Global::getGlobal();
+    if( !global.useCuda() )
         _cache.reset( CreateCubeCache( attr->cubeCacheImpl ) );
+#ifdef IV_USE_CUDA
     else
         _cache.reset( new BrickCache() );
+#endif
 
     if( _cache )
         return _cache->init( attr );

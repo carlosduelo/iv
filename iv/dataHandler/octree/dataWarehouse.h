@@ -25,6 +25,9 @@ public:
     DataWarehouse( const index_node_t min, const index_node_t max )
         : _max( max )
         , _min( min )
+        , _maxHeight( 0 )
+        , _endRange( 0 )
+        , _startRange( 0 )
     {
     }
 
@@ -33,6 +36,10 @@ public:
     void wait();
 
     void pushCube( const index_node_t id );
+    void updateMaxHeight( const uint32_t h );
+
+    const std::string getFileData() const { return _nameEndFile; } 
+    uint32_t getMaxHeight() const { return _maxHeight; }
 
 private:
     std::thread             _thread;
@@ -40,13 +47,16 @@ private:
 
     const index_node_t      _max;
     const index_node_t      _min;
+    uint32_t                _maxHeight;
+    std::mutex              _mutex;
+    index_node_t            _endRange;
+    index_node_t            _startRange;
 
     std::vector< index_node_t >                         _indices;
     std::vector< uint32_t >                             _dimensions;
     std::vector< std::shared_ptr< std::ofstream > >     _tmpFiles;
     std::vector< std::string >                          _nameTmpFiles;
 
-    std::ofstream   _endFile;
     std::string     _nameEndFile;
 
     void _run( );

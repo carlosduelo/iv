@@ -68,6 +68,13 @@ void DataWarehouse::pushCube( const index_node_t id )
     _queue.push( id );
 }
 
+void DataWarehouse::updateMaxHeight( const uint32_t m )
+{
+    std::unique_lock< std::mutex > mlock( _mutex );
+    if( m > _maxHeight )
+        _maxHeight = m;
+}
+
 void DataWarehouse::_run()
 {
     while( 1 )
@@ -118,18 +125,22 @@ void DataWarehouse::_vectorToFile( std::ofstream&   file,
                                    const std::vector< index_node_t >& vector,
                                    const uint32_t dim )
 {
-    index_node_t endRange = vector[0];
-    index_node_t startRange = vector[0];
+    if( _startRange == 0 )
+    {
+        _endRange = vector[0];
+        _startRange = vector[0];
+    }
 
     for( uint32_t i = 1; i < dim; i++ )
     {
-        if( vector[i] != endRange + 1 )
+        if( vector[i] != _endRange + 1 )
         {
-            file.write( (char*) &startRange, sizeof( index_node_t ) );
-            file.write( (char*) &endRange, sizeof( index_node_t ) );
-            startRange = vector[i];
+            file.write( (char*) &_startRange, sizeof( index_node_t ) );
+            file.write( (char*) &_endRange, sizeof( index_node_t ) );
+            std::cout << _startRange << " " << _endRange << std::endl;
+            _startRange = vector[i];
         }
-        endRange = vector[i];
+        _endRange = vector[i];
     }
 }
 
@@ -139,7 +150,8 @@ void DataWarehouse::_sort()
     std::ostringstream convert;
     convert << rand() << "Final.tmp";
     _nameEndFile = convert.str();
-    _endFile.open( convert.str().c_str(),
+    std::ofstream   endFile;
+    endFile.open( convert.str().c_str(),
                         std::ofstream::binary |
                         std::ofstream::trunc );
 
@@ -153,9 +165,10 @@ void DataWarehouse::_sort()
         std::ifstream file( _nameTmpFiles[i].c_str(), std::ofstream::binary );
         _fileToVector( file, buffer, _dimensions[i] );
         _sortVector( buffer );
-        _vectorToFile( _endFile, buffer, _dimensions[i] );
+        _vectorToFile( endFile, buffer, _dimensions[i] );
         file.close();
     }
+    endFile.close();
 }
 
 }

@@ -6,6 +6,7 @@ Notes:
 
  */
 
+#include <iv/common/init.h>
 #include <iv/dataHandler/octree/octreeConstructorAttr.h>
 #include <iv/dataHandler/octree/octreeConstructorStats.h>
 #include <iv/dataHandler/octree/octreeConstructor.h>
@@ -16,12 +17,9 @@ namespace iv
 namespace util
 {
 
-int createOctree( int argc, char ** argv )
+void createOctree( int argc, char ** argv )
 {
-    uint32_t numThreads = 8;
-
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
-
     level_t nLevels = 10;
     level_t level = 10;
     level_t readLevel = 3;
@@ -46,10 +44,7 @@ int createOctree( int argc, char ** argv )
                                                 file_path,
                                                 isosurfaces ) );
     DataHandler::OctreeConstructorAttrPtr attr( new
-                    DataHandler::OctreeConstructorAttr( attrGen,
-                                                        numThreads,
-                                                        false,
-                                                        false ) );
+                    DataHandler::OctreeConstructorAttr( attrGen ) );
 
     DataHandler::OctreeConstructorPtr oc( new
                     DataHandler::OctreeConstructor( attr, cube ) );
@@ -69,8 +64,6 @@ int createOctree( int argc, char ** argv )
 
     const DataHandler::OctreeConstructorStats& stats = oc->getStats();
     stats.print();
-
-    return 0;
 }
 
 }
@@ -79,5 +72,12 @@ int createOctree( int argc, char ** argv )
 
 int main( int argc, char ** argv )
 {
-    return iv::util::createOctree( argc, argv );
+    if( !iv::init( argc, argv ) )
+        return 0;
+
+    iv::util::createOctree( argc, argv );
+
+    iv::exit();
+
+    return 0;
 }

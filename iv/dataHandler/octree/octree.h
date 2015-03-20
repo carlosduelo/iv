@@ -55,7 +55,6 @@ private:
     const std::string _filePath;
 
     uint32_t      _maxHeight;
-
 };
 
 }

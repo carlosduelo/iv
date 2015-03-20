@@ -22,8 +22,7 @@ namespace DataHandler
 class Cache
 {
 public:
-    Cache( const cache_type_t cacheType )
-        : _cacheType ( cacheType )
+    Cache()
     {
     }
 
@@ -32,8 +31,6 @@ public:
     void stop();
 
     const ObjectHandlerPtr get( const index_node_t id );
-
-    cache_type_t getTypeCache() const { return _cacheType; }
 
     // Data From Volume
     const vec3int32_t& getRealDimension() const
@@ -57,7 +54,6 @@ public:
     }
 private:
     ControlCachePtr     _cache;
-    const cache_type_t  _cacheType;
 };
 
 }
