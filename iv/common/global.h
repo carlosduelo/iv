@@ -21,11 +21,11 @@ public:
 
 private:
     Global()
-        : _cacheSizeCPU( 256 * 1024 * 1024 ) // 256 MB
+        : _cacheSizeCPU( 1024 * 1024 * 1024 ) // 256 MB
         , _cacheSizeGPU( 128 * 1024 * 1024 ) // 128 MB
         , _useCuda( false )
-        , _maxNumThreads( 1 )
-        , _hyperThreading( true )
+        , _maxNumThreads( 8 )
+        , _hyperThreading( false )
     {
     }
 

@@ -17,14 +17,15 @@ Notes:
 
 #include <iv/common/mortonCodeUtil_CPU.h>
 
+#include <chrono>
+
 namespace iv
 {
 
 namespace DataHandler
 {
 
-bool OctreeConstructor::compute( const file_type_t& file_type,
-                                  const file_args_t& file_args )
+bool OctreeConstructor::compute()
 {
     if( _octree->getConstructorLevel() > _octree->getLevel() )
     {
@@ -60,16 +61,26 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
     // Create DataWarehouse
     _dataWarehouse = DataWarehousePtr( new DataWarehouse( min, max ) );
 
+    const Global& global = Global::getGlobal();
     // Create Cache
     CacheAttrPtr cacheAttr( new iv::DataHandler::CacheAttr() );
 
-    cacheAttr->file_type = file_type;
-    cacheAttr->file_args = file_args;
+    cacheAttr->file_type = _octree->getFileType();
+    cacheAttr->file_args = _octree->getFileArgs();
 
     cacheAttr->offset = _octree->getOffset();
     cacheAttr->nLevels = _octree->getnLevels();
+    
     cacheAttr->cubeLevel = _octree->getReadLevel();
     cacheAttr->cubeInc = _octree->getCubeInc();
+
+#ifdef IV_USE_CUDA
+    if( global.useCuda() )
+    {
+        cacheAttr->brickLevel = _octree->getReadLevel();
+        cacheAttr->brickInc = _octree->getCubeInc();
+    }
+#endif
 
     CachePtr cache( new iv::DataHandler::Cache( ) );
 
@@ -79,29 +90,37 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
     class Data
     {
     public:
-        Data( DataWarehousePtr& dPtr, CachePtr& cPtr, CacheAttrPtr& cAttr )
+        Data( DataWarehousePtr& dPtr,
+              CachePtr& cPtr,
+              CacheAttrPtr& cAttr,
+              OctreeConstructorStats& stats )
             : _dPtr( dPtr )
             , _cPtr( cPtr )
+            , _stats( stats )
         {
             wasFine = _dPtr->start() && _cPtr->init( cAttr );
         }
         ~Data()
         {
+            auto startC = std::chrono::high_resolution_clock::now();
             _dPtr->wait();
+            auto endC = std::chrono::high_resolution_clock::now();
+            _stats.incSortingTime( std::chrono::duration_cast<
+                                                    std::chrono::milliseconds>(
+                                                        endC - startC ) );
             _cPtr->stop();
         }
 
         bool wasFine;
     private:
-        DataWarehousePtr&   _dPtr;
-        CachePtr&           _cPtr;
+        DataWarehousePtr&           _dPtr;
+        CachePtr&                   _cPtr;
+        OctreeConstructorStats&     _stats;
     };
-    Data data( _dataWarehouse, cache, cacheAttr );
+    Data data( _dataWarehouse, cache, cacheAttr, _stats );
 
     if( !data.wasFine )
         return false;
-
-    const Global& global = Global::getGlobal();
 
     bool wasFine = true;
     if( global.useHyperThreading() )
@@ -121,12 +140,14 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
                     coordCubeStart.z() + _octree->getOffset().z() <
                     cache->getRealDimension().z() )
             {
+#ifdef IV_USE_CUDA
                 if( global.useCuda() )
                     _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                                   cache,
                                                                   _octree,
                                                                   _stats ) ) );
                 else
+#endif
                     _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                                   cache,
                                                                   _octree,
@@ -162,11 +183,13 @@ bool OctreeConstructor::compute( const file_type_t& file_type,
         uint32_t worker = 0;
         while( id <= idFinish )
         {
+#ifdef IV_USE_CUDA
             if( global.useCuda() )
                 _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                               cache,
                                                               _octree,
                                                               _stats ) ) );
+#endif
             else
                 _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                               cache,

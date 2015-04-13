@@ -38,7 +38,7 @@ public:
     void pushCube( const index_node_t id );
     void updateMaxHeight( const uint32_t h );
 
-    const std::string getFileData() const { return _nameEndFile; } 
+    const std::string getFileData() const { return _nameEndFile; }
     uint32_t getMaxHeight() const { return _maxHeight; }
 
 private:

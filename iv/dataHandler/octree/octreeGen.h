@@ -10,6 +10,7 @@ Notes:
 #define _IV_OCTREE_GEN_H_
 
 #include <iv/common/types.h>
+#include <iv/dataHandler/types.h>
 
 namespace iv
 {
@@ -24,15 +25,16 @@ public:
         : _attr( attr )
     {
     }
-    
-    bool compute( const std::vector< index_node_t > cubes );
+
+    bool compute( std::vector< index_node_t >& cubes );
+
+    void save();
 
 private:
     const OctreeGenAttrPtr _attr;
 
     std::vector< index_node_t > _cubes;
 
-    void _save();
 };
 
 }

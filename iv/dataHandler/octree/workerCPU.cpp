@@ -90,9 +90,12 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
                                    _attr->getnLevels() -
                                    _attr->getReadLevel() ) + 2 * _attr->getCubeInc();
 
+    vec3int32_t coordData = getMinBoxIndex2( id, _attr->getReadLevel(),
+                                            _attr->getnLevels() );
+
     for( index_node_t i = idS; i < idE; i++ )
     {
-        if( _computeCube( i, cube, dimCube, dimCubeData ) )
+        if( _computeCube( i, cube, dimCube, coordData, dimCubeData ) )
         {
             _data->pushCube( i );
             // Update MaxHeight
@@ -106,6 +109,7 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
 bool WorkerCPU::_computeCube( const index_node_t id,
                                             const float* cube,
                                             const uint32_t dimCube,
+                                            vec3int32_t    coordStartData,
                                             const uint32_t dimCubeData )
 {
     vec3int32_t coordStart = getMinBoxIndex2( id,
@@ -114,15 +118,22 @@ bool WorkerCPU::_computeCube( const index_node_t id,
     vec3int32_t coordEnd = coordStart + vec3int32_t( dimCube, dimCube, dimCube );
     const uint32_t cubeInc = _attr->getCubeInc();
 
-    for( int32_t i = coordStart.x(); i < coordEnd.x(); i++ )
-        for( int32_t j = coordStart.y(); j < coordEnd.y(); j++ )
-            for( int32_t k = coordStart.z(); k < coordEnd.z(); k++ )
+    const int32_t iS = coordStart.x() + cubeInc - coordStartData.x();
+    const int32_t iE = coordEnd.x() + cubeInc - coordStartData.x();
+    const int32_t jS = coordStart.y() + cubeInc - coordStartData.y();
+    const int32_t jE = coordEnd.y() + cubeInc - coordStartData.y();
+    const int32_t kS = coordStart.z() + cubeInc - coordStartData.z();
+    const int32_t kE = coordEnd.z() + cubeInc - coordStartData.z();
+
+    for( int32_t i = iS; i < iE; i++ )
+        for( int32_t j = jS; j < jE; j++ )
+            for( int32_t k = kS; k < kE; k++ )
             {
                 for( auto iso = _attr->getIsosurfaces().begin();
                           iso != _attr->getIsosurfaces().end();
                           iso++ )
                 {
-                    if( checkIsosurface( i+cubeInc, j+cubeInc, k+cubeInc,
+                    if( checkIsosurface( i, j, k,
                                                     dimCubeData, cube, *iso ) )
                         return true;
                 }

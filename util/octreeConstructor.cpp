@@ -7,9 +7,9 @@ Notes:
  */
 
 #include <iv/common/init.h>
-#include <iv/dataHandler/octree/octreeConstructorAttr.h>
-#include <iv/dataHandler/octree/octreeConstructorStats.h>
-#include <iv/dataHandler/octree/octreeConstructor.h>
+#include <iv/dataHandler/octree/octreeGenAttr.h>
+//#include <iv/dataHandler/octree/octreeGenStats.h>
+#include <iv/dataHandler/octree/octreeGen.h>
 
 namespace iv
 {
@@ -20,20 +20,34 @@ namespace util
 void createOctree( int argc, char ** argv )
 {
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
-    level_t nLevels = 10;
-    level_t level = 10;
+    level_t nLevels = 9;
+    level_t level = 9;
     level_t readLevel = 3;
     level_t constructorLevel = 0;
     uint32_t cubeInc = 2;
-    index_node_t cube = 1;
+    std::vector< index_node_t > cubes;
+    cubes.push_back( 1 );
 
     vec3uint32_t offset( 0,0,0 );
     std::set< float > isosurfaces;
     isosurfaces.insert( 0.5 );
 
     std::string file_path;
+    DataHandler::file_type_t file_type;
+    DataHandler::file_args_t file_args;
+    if( argc > 1 )
+    {
+        file_type = IV_FILE_TYPE_HDF5;
+        file_args.push_back( argv[1] );
+        file_args.push_back( argv[2] );
+    }
+    else
+    {
+        file_type = IV_FILE_TYPE_TEST;
+        file_args.push_back("256");
+    }
 
-    DataHandler::OctreeGenAttrPtr attrGen( new
+    DataHandler::OctreeGenAttrPtr attr( new
                     DataHandler::OctreeGenAttr( octree_type,
                                                 nLevels,
                                                 level,
@@ -42,28 +56,16 @@ void createOctree( int argc, char ** argv )
                                                 cubeInc,
                                                 offset,
                                                 file_path,
+                                                file_type,
+                                                file_args,
                                                 isosurfaces ) );
-    DataHandler::OctreeConstructorAttrPtr attr( new
-                    DataHandler::OctreeConstructorAttr( attrGen ) );
 
-    DataHandler::OctreeConstructorPtr oc( new
-                    DataHandler::OctreeConstructor( attr, cube ) );
+    DataHandler::OctreeGenPtr octreeGen( new DataHandler::OctreeGen( attr ) );
 
-    DataHandler::file_args_t args;
-    if( argc > 1 )
-    {
-        args.push_back( argv[1] );
-        args.push_back( argv[2] );
-        oc->compute( IV_FILE_TYPE_HDF5, args );
-    }
-    else
-    {
-        args.push_back("256");
-        oc->compute(IV_FILE_TYPE_TEST, args);
-    }
+    octreeGen->compute( cubes );
 
-    const DataHandler::OctreeConstructorStats& stats = oc->getStats();
-    stats.print();
+//    const DataHandler::OctreeConstructorStats& stats = oc->getStats();
+//    stats.print();
 }
 
 }

@@ -89,6 +89,7 @@ void DataWarehouse::_run()
 
 void DataWarehouse::_addCube( const index_node_t id )
 {
+    assert( id );
     if( id < _min || id > _max )
     {
         std::cerr << "Warning! trying to push a cube not in range" << std::endl;
@@ -113,7 +114,7 @@ void DataWarehouse::_fileToVector( std::ifstream& file,
                                     std::vector< index_node_t >& vector,
                                     const uint32_t dim )
 {
-    file.read( (char*) vector.data(), dim );
+    file.read( (char*) vector.data(), dim * sizeof( index_node_t ) );
 }
 
 void DataWarehouse::_sortVector( std::vector< index_node_t >& vector )
@@ -137,7 +138,8 @@ void DataWarehouse::_vectorToFile( std::ofstream&   file,
         {
             file.write( (char*) &_startRange, sizeof( index_node_t ) );
             file.write( (char*) &_endRange, sizeof( index_node_t ) );
-            std::cout << _startRange << " " << _endRange << std::endl;
+            //std::cout << _startRange << " " << _endRange << std::endl;
+            assert( _startRange != 0 && _endRange != 0 );
             _startRange = vector[i];
         }
         _endRange = vector[i];

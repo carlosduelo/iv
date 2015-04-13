@@ -9,9 +9,6 @@ Notes:
 #ifndef _IV_OCTREE_CONSTRUCTOR_ATTR_H_
 #define _IV_OCTREE_CONSTRUCTOR_ATTR_H_
 
-#include <iv/common/types.h>
-#include <iv/dataHandler/types.h>
-
 #include <iv/dataHandler/octree/octreeGenAttr.h>
 
 #include <set>
@@ -34,6 +31,8 @@ public:
            , _cubeInc( attr->getCubeInc() )
            , _isosurfaces( attr->getIsosurfaces() )
            , _offset( attr->getOffset() )
+           , _file_type( attr->getFileType() )
+           , _file_args( attr->getFileArgs() )
     {
     }
 
@@ -53,6 +52,11 @@ public:
 
     const vec3int32_t& getOffset() const { return _offset; }
 
+    file_type_t getFileType() const { return _file_type; }
+
+    const file_args_t getFileArgs() const { return _file_args; }
+
+
 private:
     const octree_type_t _octreeType;
 
@@ -66,6 +70,9 @@ private:
     const std::set<float> _isosurfaces;
 
     const vec3int32_t _offset;
+
+    const file_type_t _file_type;
+    const file_args_t _file_args;
 };
 
 }

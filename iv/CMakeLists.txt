@@ -26,6 +26,7 @@ set(IV_SOURCES
     dataHandler/octree/workerCPU.cpp
     dataHandler/octree/dataWarehouse.cpp
     dataHandler/octree/octreeConstructor.cpp
+    dataHandler/octree/octreeGen.cpp
     )
 
 # LIBRARIES

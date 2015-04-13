@@ -37,8 +37,7 @@ public:
 
     virtual ~OctreeConstructor() {}
 
-    bool compute( const file_type_t& file_type,
-                          const file_args_t& file_args );
+    bool compute();
 
     const OctreeConstructorStats& getStats() const
     {
