@@ -25,7 +25,6 @@ class CacheAttr
 public:
     CacheAttr()
         : file_type( IV_FILE_TYPE_UNKNOWN )
-        , nLevels( 0 )
         , cubeCacheImpl( IV_CUBE_CACHE_SIMPLE )
         , cubeLevel( 0 )
         , cubeInc( 0 )
@@ -43,8 +42,6 @@ public:
     file_type_t file_type;
     file_args_t file_args;
 
-    level_t nLevels;
-
     // Cube properties
     cube_cache_impl_t cubeCacheImpl;
     level_t cubeLevel;
@@ -59,7 +56,7 @@ public:
     uint32_t brickSize;  // 3^( brickDim + 2 * brickInc )
     int      deviceID;
 
-    bool compute()
+    bool compute( level_t nLevels )
     {
         if( brickLevel > 0 && cubeLevel > brickLevel )
         {

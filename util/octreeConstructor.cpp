@@ -8,7 +8,6 @@ Notes:
 
 #include <iv/common/init.h>
 #include <iv/dataHandler/octree/octreeGenAttr.h>
-//#include <iv/dataHandler/octree/octreeGenStats.h>
 #include <iv/dataHandler/octree/octreeGen.h>
 
 namespace iv
@@ -20,8 +19,8 @@ namespace util
 void createOctree( int argc, char ** argv )
 {
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
-    level_t level = 9;
-    level_t readLevel = 3;
+    level_t level = 7;
+    level_t readLevel = 7;
     level_t constructorLevel = 0;
     uint32_t cubeInc = 2;
     std::vector< index_node_t > cubes;
@@ -30,7 +29,7 @@ void createOctree( int argc, char ** argv )
     std::set< float > isosurfaces;
     isosurfaces.insert( 0.5 );
 
-    std::string file_path;
+    std::string file_path = "octree";
     DataHandler::file_type_t file_type;
     DataHandler::file_args_t file_args;
     if( argc > 1 )
@@ -42,7 +41,7 @@ void createOctree( int argc, char ** argv )
     else
     {
         file_type = IV_FILE_TYPE_TEST;
-        file_args.push_back("256");
+        file_args.push_back("1024");
     }
 
     DataHandler::OctreeGenAttrPtr attr( new
@@ -59,9 +58,7 @@ void createOctree( int argc, char ** argv )
     DataHandler::OctreeGenPtr octreeGen( new DataHandler::OctreeGen( attr ) );
 
     octreeGen->compute( cubes );
-
-//    const DataHandler::OctreeConstructorStats& stats = oc->getStats();
-//    stats.print();
+    octreeGen->printStats();
 }
 
 }

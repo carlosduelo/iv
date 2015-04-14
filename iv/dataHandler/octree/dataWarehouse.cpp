@@ -18,6 +18,13 @@ namespace iv
 namespace DataHandler
 {
 
+
+DataWarehouse::~DataWarehouse()
+{
+    if( _nameEndFile != "" )
+        remove( _nameEndFile.c_str() );
+}
+
 bool DataWarehouse::start()
 {
     // Create Files
@@ -138,7 +145,7 @@ void DataWarehouse::_vectorToFile( std::ofstream&   file,
         {
             file.write( (char*) &_startRange, sizeof( index_node_t ) );
             file.write( (char*) &_endRange, sizeof( index_node_t ) );
-            //std::cout << _startRange << " " << _endRange << std::endl;
+            _numRanges++;
             assert( _startRange != 0 && _endRange != 0 );
             _startRange = vector[i];
         }

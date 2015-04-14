@@ -11,6 +11,7 @@ Notes:
 
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
+#include <iv/dataHandler/octree/octreeConstructorStats.h>
 
 namespace iv
 {
@@ -28,13 +29,12 @@ public:
 
     bool compute( std::vector< index_node_t >& cubes );
 
-    void save();
+    void printStats() const;
 
 private:
-    const OctreeGenAttrPtr _attr;
-
+    const OctreeGenAttrPtr      _attr;
     std::vector< index_node_t > _cubes;
-
+    OctreeConstructorStats      _stats;
 };
 
 }

@@ -32,6 +32,7 @@ public:
                        const index_node_t cube )
                : _octree( octree )
                , _cube( cube )
+               , _nLevels( 0 )
     {
     }
 
@@ -49,9 +50,15 @@ public:
         return _dataWarehouse;
     }
 
+    level_t getnLevels() const
+    {
+        return _nLevels;
+    }
+
 protected:
     const OctreeConstructorAttrPtr  _octree;
     const index_node_t              _cube;
+    level_t                         _nLevels;
 
     DataWarehousePtr                _dataWarehouse;
     std::vector< WorkerPtr >        _workers;

@@ -9,8 +9,6 @@ Notes:
 #ifndef _IV_INIT_H_
 #define _IV_INIT_H_
 
-#include <iv/common/global.h>
-
 namespace iv
 {
 
@@ -20,6 +18,6 @@ void exit();
 
 }
 
-#endif // _IV_GLOBALS_H_
+#endif // _IV_INIT_H_
 
 

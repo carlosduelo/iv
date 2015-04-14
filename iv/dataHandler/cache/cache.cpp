@@ -22,9 +22,6 @@ namespace DataHandler
 
 bool Cache::init( const CacheAttrPtr& attr )
 {
-    if( !attr->compute() )
-        return false;
-
     const Global& global = Global::getGlobal();
     if( !global.useCuda() )
         _cache.reset( CreateCubeCache( attr->cubeCacheImpl ) );

@@ -119,6 +119,8 @@ bool OctreeConstructor::compute()
     if( !data.wasFine )
         return false;
 
+    _nLevels = cache->getnLevels();
+
     bool wasFine = true;
     if( global.useHyperThreading() )
     {

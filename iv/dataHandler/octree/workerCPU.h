@@ -34,9 +34,9 @@ private:
     void _computeCubeData( const index_node_t id, const float* cube );
 
     bool _computeCube( const index_node_t id, const float* cube,
-                        const uint32_t dimCube,
-                        vec3int32_t    coordStartData,
-                        const uint32_t dimCubeData );
+                       const uint32_t     dimCube,
+                       const vec3int32_t  coordStartData,
+                       const uint32_t     dimCubeData );
 };
 
 }

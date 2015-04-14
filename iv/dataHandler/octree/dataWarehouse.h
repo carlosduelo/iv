@@ -28,8 +28,12 @@ public:
         , _maxHeight( 0 )
         , _endRange( 0 )
         , _startRange( 0 )
+        , _numRanges( 0 )
+        , _nameEndFile( "" )
     {
     }
+
+    ~DataWarehouse();
 
     bool start();
 
@@ -40,6 +44,7 @@ public:
 
     const std::string getFileData() const { return _nameEndFile; }
     uint32_t getMaxHeight() const { return _maxHeight; }
+    uint32_t getNumRanges() const { return _numRanges; }
 
 private:
     std::thread             _thread;
@@ -51,6 +56,7 @@ private:
     std::mutex              _mutex;
     index_node_t            _endRange;
     index_node_t            _startRange;
+    index_node_t            _numRanges;
 
     std::vector< index_node_t >                         _indices;
     std::vector< uint32_t >                             _dimensions;

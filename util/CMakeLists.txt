@@ -11,3 +11,10 @@ target_link_libraries( ivOC
                                 IV
                                 ${Boost_LIBRARIES}
                                 )
+
+# hdf5 to ivD
+add_executable( ivh5ToivD hdf5ToivD.cpp )
+target_link_libraries( ivh5ToivD
+                                IV
+                                ${Boost_LIBRARIES}
+                                )

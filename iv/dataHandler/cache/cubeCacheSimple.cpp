@@ -30,6 +30,9 @@ bool CubeCacheSimple::_init()
     if( !_file )
         return false;
 
+    if( !_attr->compute( _file->getnLevels() ) )
+        return false;
+
     const Global& global = Global::getGlobal();
     // Allocate memory
     _numElements = global.getCacheSizeCPU() /
@@ -64,7 +67,7 @@ void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
 {
     vec3int32_t start = getMinBoxIndex2( obj->getID(),
                                         _attr->cubeLevel,
-                                        _attr->nLevels );
+                                        _file->getnLevels() );
     vec3int32_t end = start + _dim + _inc;
     start -= _inc;
 

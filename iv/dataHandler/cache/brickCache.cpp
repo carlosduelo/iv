@@ -72,10 +72,10 @@ void Reader::_read()
     }
     vec3int32_t coord = getMinBoxIndex2( _obj->getID(),
                                          _attr->brickLevel,
-                                         _attr->nLevels );
+                                         _cubeCache->getnLevels() );
     vec3int32_t coordC = getMinBoxIndex2( cubeID,
                                           _attr->cubeLevel,
-                                          _attr->nLevels );
+                                          _cubeCache->getnLevels() );
 
     std::cout << _obj->getID()<<" brick "<<coord << std::endl;
     std::cout << cubeID <<" cube "<<coordC << std::endl;
@@ -136,6 +136,9 @@ bool BrickCache::_init()
     _cubeCache.reset( CreateCubeCache( _attr->cubeCacheImpl ) );
     if( !_cubeCache )
         return false;
+    assert( _cubeCache->getnLevels() != 0 );
+    if( !_cubeCache->init( _attr ) )
+        return false;
 
     if( cudaSuccess != cudaSetDevice( _attr->deviceID ) )
     {
@@ -190,7 +193,7 @@ bool BrickCache::_init()
     _dim.set( _attr->brickDim, _attr->brickDim, _attr->brickDim );
 
     // Start Cube Cache
-    return _cubeCache->init( _attr );
+    return true;
 }
 
 void BrickCache::_stop()

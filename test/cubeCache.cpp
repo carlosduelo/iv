@@ -20,7 +20,7 @@ void test2()
 {
     iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
                                                     _attr->cubeLevel,
-                                                    _attr->nLevels );
+                                                    _cubeCache->getnLevels() );
 
     const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
     if( !obj )
@@ -36,7 +36,7 @@ void test3()
 {
     iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
                                                     _attr->cubeLevel,
-                                                    _attr->nLevels );
+                                                    _cubeCache->getnLevels() );
 
     const iv::DataHandler::ObjectHandlerPtr obj = _cubeCache->get( index );
     if( !obj )
@@ -56,7 +56,6 @@ int main( int, char ** )
     // Set attributes
     _attr->file_type = IV_FILE_TYPE_TEST;
     _attr->file_args.push_back( "128" );
-    _attr->nLevels = 7; // 2^9 = 128
     _attr->cubeLevel = 4;
     _attr->cubeInc = 2;
 
@@ -91,7 +90,7 @@ int main( int, char ** )
         _cubeCache->init( _attr );
         iv::index_node_t index = iv::coordinateToIndex( iv::vec3int32_t( 0,0,0),
                                                         _attr->cubeLevel,
-                                                        _attr->nLevels );
+                                                        _cubeCache->getnLevels() );
 
         for( unsigned i = 0; i < 2; i++ )
         {

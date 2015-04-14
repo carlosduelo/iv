@@ -90,8 +90,8 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
                                    _cache->getnLevels() -
                                    _attr->getReadLevel() ) + 2 * _attr->getCubeInc();
 
-    vec3int32_t coordData = getMinBoxIndex2( id, _attr->getReadLevel(),
-                                            _cache->getnLevels() );
+    const vec3int32_t coordData = getMinBoxIndex2( id, _attr->getReadLevel(),
+                                                    _cache->getnLevels() );
 
     for( index_node_t i = idS; i < idE; i++ )
     {
@@ -106,11 +106,11 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
     }
 }
 
-bool WorkerCPU::_computeCube( const index_node_t id,
-                                            const float* cube,
-                                            const uint32_t dimCube,
-                                            vec3int32_t    coordStartData,
-                                            const uint32_t dimCubeData )
+bool WorkerCPU::_computeCube( const index_node_t    id,
+                              const float*          cube,
+                              const uint32_t        dimCube,
+                              const vec3int32_t     coordStartData,
+                              const uint32_t        dimCubeData )
 {
     vec3int32_t coordStart = getMinBoxIndex2( id,
                                               _attr->getLevel(),
@@ -119,11 +119,11 @@ bool WorkerCPU::_computeCube( const index_node_t id,
     const uint32_t cubeInc = _attr->getCubeInc();
 
     const int32_t iS = coordStart.x() + cubeInc - coordStartData.x();
-    const int32_t iE = coordEnd.x() + cubeInc - coordStartData.x();
+    const int32_t iE = coordEnd.x()   + cubeInc - coordStartData.x();
     const int32_t jS = coordStart.y() + cubeInc - coordStartData.y();
-    const int32_t jE = coordEnd.y() + cubeInc - coordStartData.y();
+    const int32_t jE = coordEnd.y()   + cubeInc - coordStartData.y();
     const int32_t kS = coordStart.z() + cubeInc - coordStartData.z();
-    const int32_t kE = coordEnd.z() + cubeInc - coordStartData.z();
+    const int32_t kE = coordEnd.z()   + cubeInc - coordStartData.z();
 
     for( int32_t i = iS; i < iE; i++ )
         for( int32_t j = jS; j < jE; j++ )
