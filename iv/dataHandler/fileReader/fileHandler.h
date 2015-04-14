@@ -22,9 +22,11 @@ class FactoryFileHandler;
 class FileHandler
 {
 protected:
-    FileHandler() :
-          _isOpen( false ),
-          _realDimension( 0, 0, 0 )
+    FileHandler()
+        : _isOpen( false )
+        , _realDimension( 0, 0, 0 )
+        , _nLevels( 0 )
+
     {
     }
 
@@ -50,6 +52,11 @@ public:
         return _realDimension;
     }
 
+    level_t getnLevels() const
+    {
+        return _nLevels;
+    }
+
     class FileCloser
     {
     public:
@@ -67,6 +74,7 @@ protected:
 
     bool        _isOpen;
     vec3int32_t _realDimension;
+    level_t     _nLevels;
 private:
     void close( )
     {

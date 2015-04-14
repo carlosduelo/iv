@@ -41,6 +41,11 @@ bool TestFileHandler::init(
     // Set RealDimension
     _realDimension.set( dim, dim, dim );
 
+    // Set nLevels
+    float aux = log2( dim );
+    float aux2 = aux - floorf(aux);
+    _nLevels = aux2>0.0 ? aux+1 : aux;
+
     _grid.reset( new float[ dim ] );
     for( unsigned i = 0; i < dim; i++ )
         _grid[i] = (float) i;

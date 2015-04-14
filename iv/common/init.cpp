@@ -22,7 +22,7 @@ bool init( const int /*argc*/, char ** /*argv*/ )
     if( _init )
         return true;
     _init = true;
-    
+
     return true;
 }
 

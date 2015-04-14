@@ -77,6 +77,11 @@ const vec3int32_t& CubeCacheSimple::getRealDimension() const
     return _file->getRealDimension();
 }
 
+level_t CubeCacheSimple::getnLevels() const
+{
+    return _file->getnLevels();
+}
+
 const float * CubeCacheSimple::getGridX() const
 {
     return _file->getxGrid();

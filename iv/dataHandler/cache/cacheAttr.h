@@ -25,7 +25,6 @@ class CacheAttr
 public:
     CacheAttr()
         : file_type( IV_FILE_TYPE_UNKNOWN )
-        , offset( vec3int32_t( 0, 0, 0 ) )
         , nLevels( 0 )
         , cubeCacheImpl( IV_CUBE_CACHE_SIMPLE )
         , cubeLevel( 0 )
@@ -43,9 +42,6 @@ public:
     // File attributes
     file_type_t file_type;
     file_args_t file_args;
-
-    // Cache attributes
-    vec3int32_t  offset;
 
     level_t nLevels;
 

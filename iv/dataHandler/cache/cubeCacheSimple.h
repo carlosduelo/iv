@@ -24,6 +24,8 @@ public:
     // Data From Volume
     virtual const vec3int32_t& getRealDimension() const;
 
+    virtual level_t  getnLevels() const;
+
     virtual const float * getGridX() const;
 
     virtual const float * getGridY() const;

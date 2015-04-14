@@ -56,7 +56,6 @@ int main( int, char ** )
     // Set attributes
     _attr->file_type = IV_FILE_TYPE_TEST;
     _attr->file_args.push_back( "128" );
-    _attr->offset.set( 0, 0, 0 );
     _attr->nLevels = 7; // 2^9 = 128
     _attr->cubeLevel = 4;
     _attr->cubeInc = 2;

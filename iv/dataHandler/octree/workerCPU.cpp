@@ -52,7 +52,7 @@ bool checkIsosurface( const int x, const int y, const int z,
 bool WorkerCPU::_computeCube( const index_node_t cube )
 {
     const float bytesRead = powf(
-                            exp2( _attr->getnLevels() -
+                            exp2( _cache->getnLevels() -
                                   _attr->getReadLevel() ) + 2 * _attr->getCubeInc(), 3 ) *
                           sizeof(float);
     auto startR = std::chrono::high_resolution_clock::now();
@@ -85,13 +85,13 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
                        3 * ( _attr->getLevel() - _attr->getReadLevel() );
 
     const uint32_t dimCube = exp2f(
-                               _attr->getnLevels() - _attr->getLevel() );
+                               _cache->getnLevels() - _attr->getLevel() );
     const uint32_t dimCubeData = exp2f(
-                                   _attr->getnLevels() -
+                                   _cache->getnLevels() -
                                    _attr->getReadLevel() ) + 2 * _attr->getCubeInc();
 
     vec3int32_t coordData = getMinBoxIndex2( id, _attr->getReadLevel(),
-                                            _attr->getnLevels() );
+                                            _cache->getnLevels() );
 
     for( index_node_t i = idS; i < idE; i++ )
     {
@@ -100,7 +100,7 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
             _data->pushCube( i );
             // Update MaxHeight
             vec3int32_t coord = getMinBoxIndex2( i, _attr->getLevel(),
-                                                    _attr->getnLevels() );
+                                                    _cache->getnLevels() );
             _data->updateMaxHeight( coord.y() );
         }
     }
@@ -114,7 +114,7 @@ bool WorkerCPU::_computeCube( const index_node_t id,
 {
     vec3int32_t coordStart = getMinBoxIndex2( id,
                                               _attr->getLevel(),
-                                              _attr->getnLevels() );
+                                              _cache->getnLevels() );
     vec3int32_t coordEnd = coordStart + vec3int32_t( dimCube, dimCube, dimCube );
     const uint32_t cubeInc = _attr->getCubeInc();
 

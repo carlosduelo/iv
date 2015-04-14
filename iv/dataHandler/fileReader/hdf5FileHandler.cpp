@@ -61,6 +61,11 @@ bool HDF5FileHandler::init(
 
     // Set RealDimension
     _realDimension.set( _dims[0], _dims[1], _dims[2] );
+    // Set nLevels
+    const int dim = fmaxf( _dims[0], fmaxf( _dims[1], _dims[2] ) );
+    float aux = log2( dim );
+    float aux2 = aux - floorf(aux);
+    _nLevels = aux2>0.0 ? aux+1 : aux;
 
     _xGrid.reset( new float[ _dims[0] ] );
     _yGrid.reset( new float[ _dims[1] ] );

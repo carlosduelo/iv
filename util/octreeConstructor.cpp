@@ -20,7 +20,6 @@ namespace util
 void createOctree( int argc, char ** argv )
 {
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
-    level_t nLevels = 9;
     level_t level = 9;
     level_t readLevel = 3;
     level_t constructorLevel = 0;
@@ -28,7 +27,6 @@ void createOctree( int argc, char ** argv )
     std::vector< index_node_t > cubes;
     cubes.push_back( 1 );
 
-    vec3uint32_t offset( 0,0,0 );
     std::set< float > isosurfaces;
     isosurfaces.insert( 0.5 );
 
@@ -49,12 +47,10 @@ void createOctree( int argc, char ** argv )
 
     DataHandler::OctreeGenAttrPtr attr( new
                     DataHandler::OctreeGenAttr( octree_type,
-                                                nLevels,
                                                 level,
                                                 readLevel,
                                                 constructorLevel,
                                                 cubeInc,
-                                                offset,
                                                 file_path,
                                                 file_type,
                                                 file_args,

@@ -29,7 +29,7 @@ namespace DataHandler
 
 // Octree types
 #define IV_OCTREE_SINGLE 0
-#define IV_OCTREE_MULTI  1
+#define IV_OCTREE_RANGE  1
 
 typedef uint32_t                    file_type_t;
 typedef std::vector< std::string >  file_args_t;

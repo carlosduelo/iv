@@ -250,6 +250,11 @@ const vec3int32_t& BrickCache::getRealDimension() const
     return _cubeCache->getRealDimension();
 }
 
+level_t  BrickCache::getnLevels() const
+{
+    return _cubeCache->getnLevels();
+}
+
 }
 
 }

@@ -24,24 +24,20 @@ class OctreeGenAttr
 {
 public:
     OctreeGenAttr( const octree_type_t octreeType,
-                   const level_t nLevels,
                    const level_t level,
                    const level_t readLevel,
                    const level_t constructorLevel,
                    const uint32_t cubeInc,
-                   const vec3int32_t& offset,
                    const std::string& filePath,
                    const file_type_t file_type,
                    const file_args_t file_args,
                    const std::set<float>& isosurfaces )
            : _octreeType( octreeType )
-           , _nLevels( nLevels )
            , _level( level )
            , _readLevel( readLevel )
            , _constructorLevel( constructorLevel )
            , _cubeInc( cubeInc )
            , _isosurfaces( isosurfaces )
-           , _offset( offset )
            , _filePath( filePath )
            , _file_type( file_type )
            , _file_args( file_args )
@@ -52,8 +48,6 @@ public:
 
     level_t getLevel() const { return _level; }
 
-    level_t getnLevels() const { return _nLevels; }
-
     level_t getReadLevel() const { return _readLevel; }
 
     level_t getConstructorLevel() const { return _constructorLevel; }
@@ -61,8 +55,6 @@ public:
     uint32_t getCubeInc() const { return _cubeInc; }
 
     const std::set< float >& getIsosurfaces() const { return _isosurfaces; }
-
-    const vec3int32_t& getOffset() const { return _offset; }
 
     const std::string& getFilePath() const { return _filePath; }
 
@@ -72,7 +64,6 @@ public:
 
 private:
     const octree_type_t _octreeType;
-    const level_t _nLevels;
     const level_t _level;
     const level_t _readLevel;
     const level_t _constructorLevel;
@@ -80,8 +71,6 @@ private:
     const uint32_t _cubeInc;
 
     const std::set<float> _isosurfaces;
-
-    const vec3int32_t _offset;
 
     const std::string _filePath;
 

@@ -36,8 +36,6 @@ public:
 
     const std::set< float >& getIsosurfaces() const { return _isosurfaces; }
 
-    const vec3uint32_t& getOffset() const { return _offset; }
-
     const std::string& getFilePath() const { return _filePath; }
 
     uint32_t getMaxHeght() const { return _maxHeight; }
@@ -49,8 +47,6 @@ private:
     level_t _level;
 
     std::set<float> _isosurfaces;
-
-    vec3uint32_t _offset;
 
     const std::string _filePath;
 

@@ -68,9 +68,6 @@ bool OctreeConstructor::compute()
     cacheAttr->file_type = _octree->getFileType();
     cacheAttr->file_args = _octree->getFileArgs();
 
-    cacheAttr->offset = _octree->getOffset();
-    cacheAttr->nLevels = _octree->getnLevels();
-    
     cacheAttr->cubeLevel = _octree->getReadLevel();
     cacheAttr->cubeInc = _octree->getCubeInc();
 
@@ -131,14 +128,11 @@ bool OctreeConstructor::compute()
             // Check cube is outside of volume
             vec3int32_t coordCubeStart = getMinBoxIndex2( id,
                     _octree->getReadLevel(),
-                    _octree->getnLevels() );
+                    cache->getnLevels() );
 
-            if( coordCubeStart.x() + _octree->getOffset().x() <
-                    cache->getRealDimension().x()  &&
-                    coordCubeStart.y() + _octree->getOffset().y() <
-                    cache->getRealDimension().y()  &&
-                    coordCubeStart.z() + _octree->getOffset().z() <
-                    cache->getRealDimension().z() )
+            if( coordCubeStart.x() < cache->getRealDimension().x()  &&
+                coordCubeStart.y() < cache->getRealDimension().y()  &&
+                coordCubeStart.z() < cache->getRealDimension().z() )
             {
 #ifdef IV_USE_CUDA
                 if( global.useCuda() )
@@ -165,14 +159,11 @@ bool OctreeConstructor::compute()
             // Check cube is outside of volume
             vec3int32_t coordCubeStart = getMinBoxIndex2( id,
                     _octree->getReadLevel(),
-                    _octree->getnLevels() );
+                    cache->getnLevels() );
 
-            if( coordCubeStart.x() + _octree->getOffset().x() <
-                    cache->getRealDimension().x()  &&
-                    coordCubeStart.y() + _octree->getOffset().y() <
-                    cache->getRealDimension().y()  &&
-                    coordCubeStart.z() + _octree->getOffset().z() <
-                    cache->getRealDimension().z() )
+            if( coordCubeStart.x() < cache->getRealDimension().x()  &&
+                coordCubeStart.y() < cache->getRealDimension().y()  &&
+                coordCubeStart.z() < cache->getRealDimension().z() )
             {
                 numCubes++;
             }
@@ -200,17 +191,13 @@ bool OctreeConstructor::compute()
             {
                 vec3int32_t coordCubeStart = getMinBoxIndex2( id,
                         _octree->getReadLevel(),
-                        _octree->getnLevels() );
+                        cache->getnLevels() );
 
-                if( coordCubeStart.x() + _octree->getOffset().x() <
-                        cache->getRealDimension().x()  &&
-                        coordCubeStart.y() + _octree->getOffset().y() <
-                        cache->getRealDimension().y()  &&
-                        coordCubeStart.z() + _octree->getOffset().z() <
-                        cache->getRealDimension().z() )
+                if( coordCubeStart.x() < cache->getRealDimension().x()  &&
+                    coordCubeStart.y() < cache->getRealDimension().y()  &&
+                    coordCubeStart.z() < cache->getRealDimension().z() )
                 {
                     cubes++;
-                    
                     _workers[ worker ]->addCube( id );
                 }
                 id++;

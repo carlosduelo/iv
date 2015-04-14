@@ -37,7 +37,7 @@ public:
     void setCacheSizeCPU( const uint32_t size ){ _cacheSizeCPU = size; }
 #ifdef IV_USE_CUDA
     void setCacheSizeGPU( const uint32_t size ){ _cacheSizeGPU = size; }
-    void setUseCuda(){ _useCuda= true; }
+    void setUseCuda(){ _useCuda = true; }
 #endif
     void setMaxNumThreads( const uint32_t threads ){ _maxNumThreads = threads; }
     void setHyperThreading() { _hyperThreading = true; }
