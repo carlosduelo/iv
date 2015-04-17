@@ -22,7 +22,8 @@ namespace DataHandler
 // File types supported
 #define IV_FILE_TYPE_UNKNOWN    0
 #define IV_FILE_TYPE_HDF5       1
-#define IV_FILE_TYPE_TEST       2
+#define IV_FILE_TYPE_IVD        2
+#define IV_FILE_TYPE_TEST       3
 
 // Cube Cache Implementations
 #define IV_CUBE_CACHE_SIMPLE 0

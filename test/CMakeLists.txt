@@ -13,6 +13,12 @@ target_link_libraries( testFileHandler
                                 ${Boost_LIBRARIES}
                                 )
 
+# Test fileHandler
+add_executable( testIVDFileHandler ivdFileHandler.cpp )
+target_link_libraries( testIVDFileHandler
+                                IV
+                                )
+
 # Test Priority LinkedList
 add_executable( testLRULinkedList lruLinkedList.cpp )
 target_link_libraries( testLRULinkedList

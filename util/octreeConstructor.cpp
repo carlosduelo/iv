@@ -16,7 +16,7 @@ namespace iv
 namespace util
 {
 
-void createOctree( int argc, char ** argv )
+void createOctree( const int argc, char ** const argv )
 {
     DataHandler::octree_type_t octree_type = IV_OCTREE_SINGLE;
     level_t level = 7;

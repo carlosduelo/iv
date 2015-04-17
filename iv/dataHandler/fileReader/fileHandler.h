@@ -10,6 +10,7 @@ Notes:
 #define _IV_FILEHANDLER_H_
 
 #include <iv/common/types.h>
+#include <iv/common/mortonCodeUtil_CPU.h>
 
 namespace iv
 {
@@ -41,6 +42,22 @@ public:
     virtual const float * getxGrid( ) const = 0;
     virtual const float * getyGrid( ) const = 0;
     virtual const float * getzGrid( ) const = 0;
+
+    virtual void readCube( float * const data,
+                           index_node_t  id,
+                           level_t       level,
+                           level_t       nLevels,
+                           uint32_t      cubeInc
+                         ) const
+    {
+        const vec3int32_t cubeIncV( cubeInc, cubeInc, cubeInc );
+        const int32_t dim = exp2f( nLevels - level );
+        const vec3int32_t cubeDimV( dim, dim, dim);
+        const vec3int32_t start = getMinBoxIndex2( id, level, nLevels ) - cubeIncV;
+        const vec3int32_t end = start + cubeDimV + 2 * cubeIncV;
+        read( data, start, end ); 
+    }
+
 
     virtual void read( float * const data,
                        const vec3int32_t& start,

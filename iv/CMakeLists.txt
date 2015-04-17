@@ -13,6 +13,7 @@ set(IV_SOURCES
     common/global.cpp
     common/init.cpp
     dataHandler/fileReader/hdf5FileHandler.cpp
+    dataHandler/fileReader/ivdFileHandler.cpp
     dataHandler/fileReader/testFileHandler.cpp
     dataHandler/fileReader/factoryFileHandler.cpp
     dataHandler/util/lruLinkedList.cpp
