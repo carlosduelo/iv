@@ -42,8 +42,7 @@ public:
     virtual void readCube( float * const data,
                            index_node_t  id,
                            level_t       level,
-                           level_t       nLevels,
-                           uint32_t      cubeInc
+                           level_t       nLevels
                          ) const;
 
     virtual void read( float * const data,

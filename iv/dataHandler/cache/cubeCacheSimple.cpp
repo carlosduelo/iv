@@ -49,7 +49,7 @@ bool CubeCacheSimple::_init()
         return false;
     }
 
-    _inc.set( _attr->cubeInc, _attr->cubeInc, _attr->cubeInc );
+    _inc.set( global.getCubeInc(), global.getCubeInc(), global.getCubeInc() );
     _dim.set( _attr->cubeDim, _attr->cubeDim, _attr->cubeDim );
 
     return true;
@@ -68,8 +68,7 @@ void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
     _file->readCube( ( float* ) data.get(),
                      obj->getID(),
                      _attr->cubeLevel,
-                     _file->getnLevels(),
-                     _attr->cubeInc );
+                     _file->getnLevels() );
     obj->setState( CacheObject::CACHED );
 }
 

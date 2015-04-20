@@ -7,6 +7,7 @@ Notes:
  */
 
 #include <iv/common/types.h>
+#include <iv/common/global.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/types.h>
@@ -14,18 +15,19 @@ Notes:
 
 int main( int ac, char ** av )
 {
-    if( ac != 6 )
+    if( ac != 5 )
     {
         std::cout << "Usage <hdf5-file> <datase> <ivd-file> <level> <cube-inc>" << std::endl;
         return 0;
     }
 
+    const iv::Global& global = iv::Global::getGlobal();
     const unsigned fileTypeH5 = IV_FILE_TYPE_HDF5;
     std::vector<std::string> file_paramsH5;
     file_paramsH5.push_back( av[1] );
     file_paramsH5.push_back( av[2] );
     const iv::level_t level = atoi( av[4] );
-    const int32_t cubeInc = atoi( av[5] );
+    const int32_t cubeInc = global.getCubeInc();
 
     const unsigned fileTypeIVD = IV_FILE_TYPE_IVD;
     std::vector<std::string> file_paramsIVD;
@@ -91,8 +93,8 @@ int main( int ac, char ** av )
             coordCubeStart.y() < fileIV->getRealDimension().y()  &&
             coordCubeStart.z() < fileIV->getRealDimension().z() )
         {
-            fileH5->readCube( dataH5.get(), id, level, nLevels, cubeInc );
-            fileIV->readCube( dataIV.get(), id, level, nLevels, cubeInc );
+            fileH5->readCube( dataH5.get(), id, level, nLevels );
+            fileIV->readCube( dataIV.get(), id, level, nLevels );
             for( uint32_t i = 0; i < cubeSize; i++ )
             {
                 if( dataH5[i] != dataIV[i] )

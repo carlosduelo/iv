@@ -7,9 +7,11 @@ Notes:
  */
 
 #include <iv/dataHandler/octree/octreeGen.h>
-#include <iv/dataHandler/octree/octreeConstructor.h>
 
+#include <iv/common/global.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
+
+#include <iv/dataHandler/octree/octreeConstructor.h>
 
 #include <algorithm>
 
@@ -73,9 +75,10 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
     // Write to file
     std::ofstream file( _attr->getFilePath().c_str(), std::ofstream::binary );
 
+    const Global& global = Global::getGlobal();
     level_t nLevels = (*constructors.begin())->getnLevels();
     level_t level = _attr->getLevel(); 
-    uint32_t cubeInc = _attr->getCubeInc();
+    uint32_t cubeInc = global.getCubeInc();
     file.write( (char*)&nLevels, sizeof( nLevels ) );
     file.write( (char*)&level, sizeof( level ) ); 
     file.write( (char*)&maxHeight, sizeof( maxHeight ) ); 

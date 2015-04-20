@@ -69,13 +69,11 @@ bool OctreeConstructor::compute()
     cacheAttr->file_args = _octree->getFileArgs();
 
     cacheAttr->cubeLevel = _octree->getReadLevel();
-    cacheAttr->cubeInc = _octree->getCubeInc();
 
 #ifdef IV_USE_CUDA
     if( global.useCuda() )
     {
         cacheAttr->brickLevel = _octree->getReadLevel();
-        cacheAttr->brickInc = _octree->getCubeInc();
     }
 #endif
 

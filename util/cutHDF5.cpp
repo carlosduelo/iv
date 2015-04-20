@@ -74,7 +74,7 @@ void cutHDF5( const int argc, char ** const argv )
     if( ( dataspace = H5Screate_simple( 3, dimsf, NULL ) ) < 0 )
     {
         std::cerr << " unable to create the data space" << std::endl;
-        return; 
+        return;
     }
 
     if( ( datatype = H5Tcopy( H5T_IEEE_F32LE ) ) < 0 )
@@ -133,7 +133,7 @@ int main( int argc, char ** argv )
     if( !iv::init( argc, argv ) )
         return 0;
 
-    iv::util::cutHDF5( argc, argv ); 
+    iv::util::cutHDF5( argc, argv );
 
     iv::exit();
 

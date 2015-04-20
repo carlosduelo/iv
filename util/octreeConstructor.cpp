@@ -7,6 +7,8 @@ Notes:
  */
 
 #include <iv/common/init.h>
+#include <iv/common/global.h>
+
 #include <iv/dataHandler/octree/octreeGenAttr.h>
 #include <iv/dataHandler/octree/octreeGen.h>
 
@@ -22,7 +24,6 @@ void createOctree( const int argc, char ** const argv )
     level_t level = 7;
     level_t readLevel = 7;
     level_t constructorLevel = 0;
-    uint32_t cubeInc = 2;
     std::vector< index_node_t > cubes;
     cubes.push_back( 1 );
 
@@ -49,7 +50,6 @@ void createOctree( const int argc, char ** const argv )
                                                 level,
                                                 readLevel,
                                                 constructorLevel,
-                                                cubeInc,
                                                 file_path,
                                                 file_type,
                                                 file_args,

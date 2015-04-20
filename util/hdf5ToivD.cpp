@@ -7,6 +7,7 @@ Notes:
  */
 
 #include <iv/common/init.h>
+#include <iv/common/global.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/types.h>
@@ -30,8 +31,10 @@ void createivD( const int argc, char ** const argv )
         return;
     }
 
+    const Global& global = Global::getGlobal();
+
     level_t level = 7;
-    int32_t cubeInc = 2;
+    int32_t cubeInc = global.getCubeInc();
     DataHandler::file_type_t file_type = IV_FILE_TYPE_HDF5;;
     DataHandler::file_args_t file_args;
     file_args.push_back( argv[1] );

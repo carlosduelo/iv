@@ -10,6 +10,8 @@ Notes:
 #define _IV_CACHE_ATTR_H_
 
 #include <iv/common/types.h>
+#include <iv/common/global.h>
+
 #include <iv/dataHandler/types.h>
 
 #include <math.h>
@@ -27,11 +29,9 @@ public:
         : file_type( IV_FILE_TYPE_UNKNOWN )
         , cubeCacheImpl( IV_CUBE_CACHE_SIMPLE )
         , cubeLevel( 0 )
-        , cubeInc( 0 )
         , cubeDim( 0 )
         , cubeSize( 0 )
         , brickLevel( 0 )
-        , brickInc( 0 )
         , brickDim( 0 )
         , brickSize( 0 )
         , deviceID( 0 )
@@ -45,13 +45,11 @@ public:
     // Cube properties
     cube_cache_impl_t cubeCacheImpl;
     level_t cubeLevel;
-    uint32_t cubeInc;
     uint32_t cubeDim;   // 2^( nLevels - cubeLevel )
     uint32_t cubeSize;  // 3^( cubeDim + 2 * cubeInc )
 
     // Brick properties
     level_t brickLevel;
-    uint32_t brickInc;
     uint32_t brickDim;   // 2^( nLevels - brickLevel )
     uint32_t brickSize;  // 3^( brickDim + 2 * brickInc )
     int      deviceID;
@@ -64,11 +62,12 @@ public:
             return false;
         }
 
+        const Global& global = Global::getGlobal();
         cubeDim  = exp2f( nLevels - cubeLevel );
-        cubeSize = powf( cubeDim + 2 * cubeInc, 3 );
+        cubeSize = powf( cubeDim + 2 * global.getCubeInc(), 3 );
 
         brickDim  = exp2f( nLevels - brickLevel );
-        brickSize = powf( cubeDim + 2 * brickInc, 3 );
+        brickSize = powf( cubeDim + 2 * global.getBrickInc(), 3 );
 
         return true;
     }

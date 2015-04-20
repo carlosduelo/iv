@@ -7,6 +7,7 @@ Notes:
  */
 
 #include <iv/common/mortonCodeUtil_CPU.h>
+
 #include <iv/dataHandler/cache/cacheAttr.h>
 #include <iv/dataHandler/cache/cache.h>
 #include <iv/dataHandler/cache/objectHandler.h>
@@ -57,9 +58,7 @@ int main( int, char ** )
     _attr->file_type = IV_FILE_TYPE_TEST;
     _attr->file_args.push_back( "128" );
     _attr->cubeLevel = 4;
-    _attr->cubeInc = 2;
     _attr->brickLevel = 6;
-    _attr->brickInc = 2;
     _attr->deviceID = 0;
 
     // TEST 1

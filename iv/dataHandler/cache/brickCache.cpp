@@ -81,8 +81,9 @@ void Reader::_read()
     std::cout << cubeID <<" cube "<<coordC << std::endl;
     coord -= coordC;
 
-    int32_t dimCube  = _attr->cubeDim + 2 * _attr->cubeInc;
-    int32_t dimBrick = _attr->brickDim + 2 * _attr->brickInc;
+    const Global& global = Global::getGlobal();
+    int32_t dimCube  = _attr->cubeDim + 2 * global.getCubeInc();
+    int32_t dimBrick = _attr->brickDim + 2 * global.getBrickInc();
 
     cudaMemcpy3DParms myParms;
     myParms.srcArray = 0;
@@ -189,7 +190,7 @@ bool BrickCache::_init()
         return false;
     }
 
-    _inc.set( _attr->brickInc, _attr->brickInc, _attr->brickInc );
+    _inc.set( global.getBrickInc(), global.getBrickInc(), global.getBrickInc()  );
     _dim.set( _attr->brickDim, _attr->brickDim, _attr->brickDim );
 
     // Start Cube Cache

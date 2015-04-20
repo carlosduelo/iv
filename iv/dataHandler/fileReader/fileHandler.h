@@ -10,6 +10,7 @@ Notes:
 #define _IV_FILEHANDLER_H_
 
 #include <iv/common/types.h>
+#include <iv/common/global.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 namespace iv
@@ -46,10 +47,11 @@ public:
     virtual void readCube( float * const data,
                            index_node_t  id,
                            level_t       level,
-                           level_t       nLevels,
-                           uint32_t      cubeInc
+                           level_t       nLevels
                          ) const
     {
+        const Global& global = Global::getGlobal();
+        uint32_t cubeInc = global.getCubeInc();
         const vec3int32_t cubeIncV( cubeInc, cubeInc, cubeInc );
         const int32_t dim = exp2f( nLevels - level );
         const vec3int32_t cubeDimV( dim, dim, dim);

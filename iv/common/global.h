@@ -26,6 +26,8 @@ private:
         , _useCuda( false )
         , _maxNumThreads( 8 )
         , _hyperThreading( false )
+        , _cubeInc( 2 )
+        , _brickInc( 2 )
     {
     }
 
@@ -35,20 +37,27 @@ private:
 
 public:
     void setCacheSizeCPU( const uint32_t size ){ _cacheSizeCPU = size; }
+    uint32_t getCacheSizeCPU() const { return _cacheSizeCPU; }
+
 #ifdef IV_USE_CUDA
     void setCacheSizeGPU( const uint32_t size ){ _cacheSizeGPU = size; }
+    uint32_t getCacheSizeGPU() const { return _cacheSizeGPU; }
+
     void setUseCuda(){ _useCuda = true; }
 #endif
-    void setMaxNumThreads( const uint32_t threads ){ _maxNumThreads = threads; }
-    void setHyperThreading() { _hyperThreading = true; }
-
-    uint32_t getCacheSizeCPU() const { return _cacheSizeCPU; }
     bool useCuda() const { return _useCuda; }
+
+    void setMaxNumThreads( const uint32_t threads ){ _maxNumThreads = threads; }
     uint32_t getMaxNumThreads() const { return _maxNumThreads; }
+
+    void setHyperThreading() { _hyperThreading = true; }
     bool useHyperThreading() const { return _hyperThreading; }
-#ifdef IV_USE_CUDA
-    uint32_t getCacheSizeGPU() const { return _cacheSizeGPU; }
-#endif
+
+    void     setCubeInc( const uint32_t cubeInc ) { _cubeInc = cubeInc; }
+    uint32_t getCubeInc() const { return _cubeInc; }
+
+    void     setBrickInc( const uint32_t brickInc ) { _brickInc = brickInc; }
+    uint32_t getBrickInc() const { return _brickInc; }
 
 private:
     // Maximum memory allocated on the CPU
@@ -61,6 +70,12 @@ private:
 
     uint32_t    _maxNumThreads;
     bool        _hyperThreading;
+
+    // Data
+    uint32_t     _cubeInc;
+#ifdef IV_USE_CUDA
+    uint32_t    _brickInc;
+#endif
 };
 
 }

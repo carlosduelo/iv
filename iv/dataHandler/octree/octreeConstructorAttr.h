@@ -27,7 +27,6 @@ public:
            , _level( attr->getLevel() )
            , _readLevel( attr->getReadLevel() )
            , _constructorLevel( attr->getConstructorLevel() )
-           , _cubeInc( attr->getCubeInc() )
            , _isosurfaces( attr->getIsosurfaces() )
            , _file_type( attr->getFileType() )
            , _file_args( attr->getFileArgs() )
@@ -42,8 +41,6 @@ public:
 
     level_t getConstructorLevel() const { return _constructorLevel; }
 
-    uint32_t getCubeInc() const { return _cubeInc; }
-
     const std::set< float >& getIsosurfaces() const { return _isosurfaces; }
 
     file_type_t getFileType() const { return _file_type; }
@@ -57,8 +54,6 @@ private:
     const level_t _level;
     const level_t _readLevel;
     const level_t _constructorLevel;
-
-    const uint32_t _cubeInc;
 
     const std::set<float> _isosurfaces;
 

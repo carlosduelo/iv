@@ -14,6 +14,7 @@ Notes:
 #include <iv/dataHandler/octree/octreeConstructorAttr.h>
 #include <iv/dataHandler/octree/dataWarehouse.h>
 
+#include <iv/common/global.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <chrono>
@@ -51,9 +52,10 @@ bool checkIsosurface( const int x, const int y, const int z,
 
 bool WorkerCPU::_computeCube( const index_node_t cube )
 {
+    const Global& global = Global::getGlobal();
     const float bytesRead = powf(
                             exp2( _attr->getnLevels() -
-                                  _attr->getReadLevel() ) + 2 * _attr->getCubeInc(), 3 ) *
+                                  _attr->getReadLevel() ) + 2 * global.getCubeInc(), 3 ) *
                           sizeof(float);
     auto startR = std::chrono::high_resolution_clock::now();
         ObjectHandlerPtr o = _cache->get( cube );
@@ -84,11 +86,12 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
     index_node_t idE = (id + 1) <<
                        3 * ( _attr->getLevel() - _attr->getReadLevel() );
 
+    const Global& global = Global::getGlobal();
     const uint32_t dimCube = exp2f(
                                _attr->getnLevels() - _attr->getLevel() );
     const uint32_t dimCubeData = exp2f(
                                    _attr->getnLevels() -
-                                   _attr->getReadLevel() ) + 2 * _attr->getCubeInc();
+                                   _attr->getReadLevel() ) + 2 * global.getCubeInc();
 
     for( index_node_t i = idS; i < idE; i++ )
     {
@@ -107,7 +110,8 @@ bool WorkerCPU::_computeCube( const index_node_t id,
                                               _attr->getLevel(),
                                               _attr->getnLevels() );
     vec3int32_t coordEnd = coordStart + vec3int32_t( dimCube, dimCube, dimCube );
-    const uint32_t cubeInc = _attr->getCubeInc();
+    const Global& global = Global::getGlobal();
+    const uint32_t cubeInc = global.getCubeInc();
 
     for( int32_t i = coordStart.x(); i < coordEnd.x(); i++ )
         for( int32_t j = coordStart.y(); j < coordEnd.y(); j++ )

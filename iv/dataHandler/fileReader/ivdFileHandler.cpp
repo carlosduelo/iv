@@ -96,11 +96,10 @@ const float * IVDFileHandler::getzGrid( ) const
 void IVDFileHandler::readCube( float * const data,
                                index_node_t  id,
                                level_t       level,
-                               level_t       nLevels,
-                               uint32_t      cubeInc
+                               level_t       nLevels
                              ) const
 {
-    if( nLevels != _nLevels || level != _level || cubeInc != _cubeInc )
+    if( nLevels != _nLevels || level != _level )
     {
         std:: cerr << "IVD File Handler parameters erroneous" << std::endl;
         return;
