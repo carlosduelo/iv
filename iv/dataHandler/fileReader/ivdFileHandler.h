@@ -64,6 +64,8 @@ private:
     int32_t     _numCubes;
     int32_t*    _offsets;
     float *     _cubes;
+    index_node_t _idStart;
+    index_node_t _idFinish;
 
     /*
      * Grid vectors

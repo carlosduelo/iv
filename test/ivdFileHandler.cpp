@@ -39,7 +39,7 @@ int main( int ac, char ** av )
             iv::DataHandler::FactoryFileHandler::CreateFileHandler(
                                                         fileTypeIVD, file_paramsIVD );
 
-    // Compare nLevels 
+    // Compare nLevels
     if( fileH5->getnLevels() != fileIV->getnLevels() )
     {
         std::cout << "nLevels differ" << std::endl;
@@ -72,7 +72,7 @@ int main( int ac, char ** av )
             std::cout << "Grids are different" << std::endl;
             return 0;
         }
-    
+
     // Compare data
     const iv::level_t nLevels = fileH5->getnLevels();
     const uint32_t dim = exp2f( nLevels - level ) + 2 * cubeInc;
@@ -86,24 +86,30 @@ int main( int ac, char ** av )
 
     for( iv::index_node_t id = idStart; id <= idFinish; id++ )
     {
-        fileH5->readCube( dataH5.get(), id, level, nLevels, cubeInc );
-        fileIV->readCube( dataIV.get(), id, level, nLevels, cubeInc );
-        for( uint32_t i = 0; i < cubeSize; i++ )
+        iv::vec3int32_t coordCubeStart = iv::getMinBoxIndex2( id, level, nLevels );
+        if( coordCubeStart.x() < fileIV->getRealDimension().x()  &&
+            coordCubeStart.y() < fileIV->getRealDimension().y()  &&
+            coordCubeStart.z() < fileIV->getRealDimension().z() )
         {
-            if( dataH5[i] != dataIV[i] )
+            fileH5->readCube( dataH5.get(), id, level, nLevels, cubeInc );
+            fileIV->readCube( dataIV.get(), id, level, nLevels, cubeInc );
+            for( uint32_t i = 0; i < cubeSize; i++ )
             {
-                std::cerr << "Error results differ in cube " << id << " "
-                          << iv::getMinBoxIndex2( id, level, nLevels ) << " "
-                          << i << " "
-                          << dataH5[i] << " "
-                          << dataIV[i]
-                          << std::endl;
-                          #if 0
-                for( uint32_t j = 0; j < cubeSize; j++ )
-                          std::cout << dataH5[j] << " "
-                          << dataIV[j] << std::endl;
-                          #endif
-                return 0;
+                if( dataH5[i] != dataIV[i] )
+                {
+                    std::cerr << "Error results differ in cube " << id << " "
+                              << iv::getMinBoxIndex2( id, level, nLevels ) << " "
+                              << i << " "
+                              << dataH5[i] << " "
+                              << dataIV[i]
+                              << std::endl;
+                              #if 1
+                    for( uint32_t j = 0; j < cubeSize; j++ )
+                              std::cout << dataH5[j] << " "
+                              << dataIV[j] << std::endl;
+                              #endif
+                    return 0;
+                }
             }
         }
     }

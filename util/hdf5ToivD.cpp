@@ -91,7 +91,7 @@ void createivD( const int argc, char ** const argv )
     fileO.write( (char*)offsets.data(),
                  ( idFinish - idStart + 1 ) * sizeof( int32_t ) );
 
-    const std::streamoff startData =    sizeof( nLevels ) +
+    const std::streampos startData =    sizeof( nLevels ) +
                                         sizeof( level ) +
                                         sizeof( cubeInc ) +
                                         sizeof( dimension.x() ) +
@@ -134,7 +134,7 @@ void createivD( const int argc, char ** const argv )
     for( int32_t x = 0; x < limitX; x += dim )
     {
         const vec3int32_t startPlanes( x - cubeInc, -cubeInc, -cubeInc );
-        const vec3int32_t endPlanes( x + dim + cubeInc, limitY + cubeInc, limitZ + cubeInc );
+        const vec3int32_t endPlanes = startPlanes + dimPlanes;
         auto startR = std::chrono::high_resolution_clock::now();
         file->read( planes.get(), startPlanes, endPlanes );
         auto endR = std::chrono::high_resolution_clock::now();
@@ -148,29 +148,31 @@ void createivD( const int argc, char ** const argv )
                 const index_node_t id = coordinateToIndex( coordCube, level, nLevels );
                 if( offsets[ id - idStart ] >= 0 )
                 {
+                    const vec3int32_t coordPlanes = coordCube - startPlanes;
                     // Read Cube
-                    uint32_t offsetPlanes = z + y * dimPlanes.z();
                     uint32_t offsetCube = 0;
                     for( int32_t xC = 0; xC < dimCube.x(); xC++ )
                     {
                         for( int32_t yC = 0; yC < dimCube.y(); yC++ )
                         {
+                            const uint32_t offsetPlanes =
+                                        ( coordPlanes.z() - cubeInc ) +
+                                        ( coordPlanes.y() - cubeInc + yC ) * ( dimPlanes.z() ) +
+                                        ( coordPlanes.x() - cubeInc + xC ) * ( dimPlanes.z() * dimPlanes.y() );
                             memcpy( (void*) ( cube.get() + offsetCube ),
                                     (void*) ( planes.get() + offsetPlanes ),
                                     dimCube.z() * sizeof( float ) );
 
                             offsetCube += dimCube.z();
-                            offsetPlanes += dimPlanes.z();
                         }
-                        offsetPlanes += dimPlanes.y()*dimPlanes.z();
                     }
                     // Write Cube
                     auto startW = std::chrono::high_resolution_clock::now();
                     fileO.seekp( startData +
-                                    (std::streamoff)offsets[ id - idStart ] *
-                                    (std::streamoff)cubeSize * 
-                                    (std::streamoff)sizeof( float ),
-                                 std::ios_base::beg );
+                                    (std::streampos)offsets[ id - idStart ] *
+                                    (std::streampos)cubeSize *
+                                    (std::streampos)sizeof( float ) );
+                                 //std::ios_base::beg );
                     fileO.write( (char*)cube.get(), cubeSize * sizeof( float ) );
                     auto endW = std::chrono::high_resolution_clock::now();
                     wTime += std::chrono::duration_cast< std::chrono::seconds >( endW - startW );

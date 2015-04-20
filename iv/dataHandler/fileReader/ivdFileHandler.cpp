@@ -64,9 +64,9 @@ bool IVDFileHandler::init( const file_args_t& file_params )
     data += ydim * sizeof( float );
     _zGrid = (float*) data;
     data += zdim * sizeof( float );
-    const index_node_t idStart  = 1 << 3 * _level;
-    const index_node_t idFinish = ( 2 << 3 * _level ) - 1;
-    _numCubes = idFinish - idStart + 1;
+    _idStart  = 1 << 3 * _level;
+    _idFinish = ( 2 << 3 * _level ) - 1;
+    _numCubes = _idFinish - _idStart + 1;
     _offsets = (int32_t*) data;
     data += _numCubes * sizeof( int32_t );
     _cubes = (float*) data;
@@ -106,7 +106,7 @@ void IVDFileHandler::readCube( float * const data,
         return;
     }
 
-    memcpy( data, _cubes + _offsets[ id ] * _cubeSize, _cubeSize * sizeof( float ) );
+    memcpy( data, _cubes + (size_t)_offsets[ id - _idStart ] * _cubeSize, _cubeSize * sizeof( float ) );
 }
 
 void IVDFileHandler::read( float * const,

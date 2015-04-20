@@ -65,13 +65,11 @@ void CubeCacheSimple::_stop()
 void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
                               const LRULinkedList::node_ref data )
 {
-    vec3int32_t start = getMinBoxIndex2( obj->getID(),
-                                        _attr->cubeLevel,
-                                        _file->getnLevels() );
-    vec3int32_t end = start + _dim + _inc;
-    start -= _inc;
-
-    _file->read( ( float* ) data.get(), start, end );
+    _file->readCube( ( float* ) data.get(),
+                     obj->getID(),
+                     _attr->cubeLevel,
+                     _file->getnLevels(),
+                     _attr->cubeInc );
     obj->setState( CacheObject::CACHED );
 }
 

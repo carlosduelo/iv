@@ -55,7 +55,7 @@ public:
         const vec3int32_t cubeDimV( dim, dim, dim);
         const vec3int32_t start = getMinBoxIndex2( id, level, nLevels ) - cubeIncV;
         const vec3int32_t end = start + cubeDimV + 2 * cubeIncV;
-        read( data, start, end ); 
+        read( data, start, end );
     }
 
 
