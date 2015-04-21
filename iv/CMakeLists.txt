@@ -34,6 +34,7 @@ set(IV_SOURCES
 set(IV_LIBRARIES
     pthread
     ${HDF5_LIBRARIES}
+    ${Boost_LIBRARIES}
     )
 
 if(CUDA_FOUND)

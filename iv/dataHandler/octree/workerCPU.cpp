@@ -14,7 +14,7 @@ Notes:
 #include <iv/dataHandler/octree/octreeConstructorAttr.h>
 #include <iv/dataHandler/octree/dataWarehouse.h>
 
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <chrono>
@@ -52,7 +52,7 @@ bool checkIsosurface( const int x, const int y, const int z,
 
 bool WorkerCPU::_computeCube( const index_node_t cube )
 {
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     const float bytesRead = powf(
                             exp2( _cache->getnLevels() -
                                   _attr->getReadLevel() ) + 2 * global.getCubeInc(), 3 ) *
@@ -86,7 +86,7 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
     index_node_t idE = (id + 1) <<
                        3 * ( _attr->getLevel() - _attr->getReadLevel() );
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     const uint32_t dimCube = exp2f(
                                _cache->getnLevels() - _attr->getLevel() );
     const uint32_t dimCubeData = exp2f(
@@ -119,7 +119,7 @@ bool WorkerCPU::_computeCube( const index_node_t    id,
                                               _attr->getLevel(),
                                               _cache->getnLevels() );
     vec3int32_t coordEnd = coordStart + vec3int32_t( dimCube, dimCube, dimCube );
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     const uint32_t cubeInc = global.getCubeInc();
 
     const int32_t iS = coordStart.x() + cubeInc - coordStartData.x();

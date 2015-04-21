@@ -8,7 +8,7 @@ Notes:
 
 #include <iv/dataHandler/cache/brickCache.h>
 
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/cache/cacheAttr.h>
@@ -81,7 +81,7 @@ void Reader::_read()
     std::cout << cubeID <<" cube "<<coordC << std::endl;
     coord -= coordC;
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     int32_t dimCube  = _attr->cubeDim + 2 * global.getCubeInc();
     int32_t dimBrick = _attr->brickDim + 2 * global.getBrickInc();
 
@@ -148,7 +148,7 @@ bool BrickCache::_init()
         return false;
     }
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     // Allocate memory
     _numElements = global.getCacheSizeGPU() /
                                     ( _attr->brickSize * sizeof( float ) );

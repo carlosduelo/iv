@@ -8,7 +8,7 @@ Notes:
 
 #include <iv/dataHandler/octree/octreeGen.h>
 
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/octree/octreeConstructor.h>
@@ -38,7 +38,7 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
 {
     if( cubes.size() == 0 )
         return true;
-        
+
     // Sort cubes
     std::sort( cubes.begin(), cubes.end() );
 
@@ -68,22 +68,22 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
     {
         numRanges += (*c)->getData()->getNumRanges();
         maxHeight = (*c)->getData()->getMaxHeight() > maxHeight
-                        ? (*c)->getData()->getMaxHeight() 
+                        ? (*c)->getData()->getMaxHeight()
                         : maxHeight;
     }
 
     // Write to file
     std::ofstream file( _attr->getFilePath().c_str(), std::ofstream::binary );
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     level_t nLevels = (*constructors.begin())->getnLevels();
-    level_t level = _attr->getLevel(); 
+    level_t level = _attr->getLevel();
     uint32_t cubeInc = global.getCubeInc();
     file.write( (char*)&nLevels, sizeof( nLevels ) );
-    file.write( (char*)&level, sizeof( level ) ); 
-    file.write( (char*)&maxHeight, sizeof( maxHeight ) ); 
-    file.write( (char*)&cubeInc, sizeof( cubeInc ) ); 
-    file.write( (char*)&numRanges, sizeof( numRanges ) ); 
+    file.write( (char*)&level, sizeof( level ) );
+    file.write( (char*)&maxHeight, sizeof( maxHeight ) );
+    file.write( (char*)&cubeInc, sizeof( cubeInc ) );
+    file.write( (char*)&numRanges, sizeof( numRanges ) );
 
     for( auto c = constructors.begin(); c != constructors.end(); ++c )
     {

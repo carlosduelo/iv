@@ -130,12 +130,12 @@ void cutHDF5( const int argc, char ** const argv )
 
 int main( int argc, char ** argv )
 {
-    if( !iv::init( argc, argv ) )
+    if( !iv::IV::init( argc, argv ) )
         return 0;
 
     iv::util::cutHDF5( argc, argv );
 
-    iv::exit();
+    iv::IV::exit();
 
     return 0;
 }

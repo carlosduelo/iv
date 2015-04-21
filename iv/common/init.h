@@ -6,18 +6,26 @@ Notes:
 
  */
 
-#ifndef _IV_INIT_H_
-#define _IV_INIT_H_
+#ifndef _IV_H_
+#define _IV_H_
+
+#include <iv/common/global.h>
 
 namespace iv
 {
 
-bool init( const int argc, char ** argv );
+class IV
+{
+public:
+    static bool init( const int argc, char ** argv );
 
-void exit();
+    static const Global& getGlobal();
+
+    static void exit();
+};
 
 }
 
-#endif // _IV_INIT_H_
+#endif // _IV_H_
 
 

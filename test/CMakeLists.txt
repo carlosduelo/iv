@@ -10,7 +10,6 @@ add_executable( testFileHandler fileHandler.cpp )
 target_link_libraries( testFileHandler
                                 IV
                                 ${HDF5_HL_LIBRARIES}
-                                ${Boost_LIBRARIES}
                                 )
 
 # Test fileHandler

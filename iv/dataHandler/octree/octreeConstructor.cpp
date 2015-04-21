@@ -6,7 +6,7 @@ Notes:
 
  */
 
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 
 #include <iv/dataHandler/octree/octreeConstructor.h>
 #include <iv/dataHandler/octree/octreeConstructorStats.h>
@@ -61,7 +61,7 @@ bool OctreeConstructor::compute()
     // Create DataWarehouse
     _dataWarehouse = DataWarehousePtr( new DataWarehouse( min, max ) );
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     // Create Cache
     CacheAttrPtr cacheAttr( new iv::DataHandler::CacheAttr() );
 

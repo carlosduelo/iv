@@ -10,14 +10,15 @@ Notes:
 #define _IV_GLOBALS_H_
 
 #include <cstdint>
+#include <iv/common/types.h>
+#include <iv/dataHandler/types.h>
 
 namespace iv
 {
 
 class Global
 {
-public:
-    static const Global& getGlobal();
+friend class IV;
 
 private:
     Global()
@@ -26,14 +27,21 @@ private:
         , _useCuda( false )
         , _maxNumThreads( 8 )
         , _hyperThreading( false )
+        , _nLevels( 0 )
+        , _cubeLevel( 0 )
         , _cubeInc( 2 )
+#ifdef IV_USE_CUDA
+        , _brickLevel( 0 )
         , _brickInc( 2 )
+#endif
     {
     }
 
     Global(Global const&) = delete;
 
     void operator=(Global const&)  = delete;
+
+    static Global& getInstance();
 
 public:
     void setCacheSizeCPU( const uint32_t size ){ _cacheSizeCPU = size; }
@@ -53,11 +61,30 @@ public:
     void setHyperThreading() { _hyperThreading = true; }
     bool useHyperThreading() const { return _hyperThreading; }
 
+    void setFileType( const DataHandler::file_type_t file_type ){ _file_type = file_type; }
+    DataHandler::file_type_t getFileType() const { return _file_type; }
+
+    void setFileArgs( const DataHandler::file_args_t& file_args ) { _file_args = file_args; }
+    const DataHandler::file_args_t& getFileArgs() const { return _file_args; }
+
+    void setnLevels( const level_t nLevels ) { _nLevels = nLevels; }
+    level_t getnLevels() const { return _nLevels; }
+
+    void setCubeLevel( const level_t cubeLevel ) { _cubeLevel = cubeLevel; }
+    level_t getCubeLevel() const { return _cubeLevel; }
+
+#ifdef IV_USE_CUDA
+    void setBrickLevel( const level_t brickLevel ) { _brickLevel = brickLevel; }
+    level_t getBrickLevel() const { return _brickLevel; }
+#endif
+
     void     setCubeInc( const uint32_t cubeInc ) { _cubeInc = cubeInc; }
     uint32_t getCubeInc() const { return _cubeInc; }
 
+#ifdef IV_USE_CUDA
     void     setBrickInc( const uint32_t brickInc ) { _brickInc = brickInc; }
     uint32_t getBrickInc() const { return _brickInc; }
+#endif
 
 private:
     // Maximum memory allocated on the CPU
@@ -71,9 +98,16 @@ private:
     uint32_t    _maxNumThreads;
     bool        _hyperThreading;
 
+    // File attributes
+    DataHandler::file_type_t _file_type;
+    DataHandler::file_args_t _file_args;
+
     // Data
+    level_t      _nLevels;
+    level_t      _cubeLevel;
     uint32_t     _cubeInc;
 #ifdef IV_USE_CUDA
+    level_t     _brickLevel;
     uint32_t    _brickInc;
 #endif
 };

@@ -31,7 +31,7 @@ void createivD( const int argc, char ** const argv )
         return;
     }
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
 
     level_t level = 7;
     int32_t cubeInc = global.getCubeInc();
@@ -197,12 +197,12 @@ void createivD( const int argc, char ** const argv )
 
 int main( int argc, char ** argv )
 {
-    if( !iv::init( argc, argv ) )
+    if( !iv::IV::init( argc, argv ) )
         return 0;
 
-    iv::util::createivD( argc, argv ); 
+    iv::util::createivD( argc, argv );
 
-    iv::exit();
+    iv::IV::exit();
 
     return 0;
 }

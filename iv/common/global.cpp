@@ -10,9 +10,10 @@ Notes:
 
 namespace iv
 {
-    const Global& Global::getGlobal()
-    {
-        static Global instance;
-        return instance;
-    }
+Global& Global::getInstance()
+{
+    static Global global;
+    return global;
+}
+
 }

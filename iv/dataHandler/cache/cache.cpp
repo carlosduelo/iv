@@ -8,7 +8,7 @@ Notes:
 
 #include <iv/dataHandler/cache/cache.h>
 
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 
 #include <iv/dataHandler/cache/cacheAttr.h>
 #include <iv/dataHandler/cache/cubeCacheFactory.h>
@@ -22,7 +22,7 @@ namespace DataHandler
 
 bool Cache::init( const CacheAttrPtr& attr )
 {
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     if( !global.useCuda() )
         _cache.reset( CreateCubeCache( attr->cubeCacheImpl ) );
 #ifdef IV_USE_CUDA

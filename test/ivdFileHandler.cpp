@@ -7,7 +7,7 @@ Notes:
  */
 
 #include <iv/common/types.h>
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/types.h>
@@ -15,13 +15,15 @@ Notes:
 
 int main( int ac, char ** av )
 {
+    iv::IV::init( ac, av );
+
     if( ac != 5 )
     {
         std::cout << "Usage <hdf5-file> <datase> <ivd-file> <level> <cube-inc>" << std::endl;
         return 0;
     }
 
-    const iv::Global& global = iv::Global::getGlobal();
+    const iv::Global& global = iv::IV::getGlobal();
     const unsigned fileTypeH5 = IV_FILE_TYPE_HDF5;
     std::vector<std::string> file_paramsH5;
     file_paramsH5.push_back( av[1] );
@@ -116,4 +118,5 @@ int main( int ac, char ** av )
         }
     }
 
+    iv::IV::exit( );
 }

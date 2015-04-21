@@ -53,6 +53,9 @@ add_subdirectory(iv)
 # Compile Utils
 add_subdirectory(util)
 
+# Compile Benchmarks
+add_subdirectory(bench)
+
 # Compile test
 add_subdirectory(test)
 

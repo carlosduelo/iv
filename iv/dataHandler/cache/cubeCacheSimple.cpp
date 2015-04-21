@@ -8,7 +8,7 @@ Notes:
 
 #include <iv/dataHandler/cache/cubeCacheSimple.h>
 
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 #include <iv/dataHandler/cache/cacheAttr.h>
@@ -33,7 +33,7 @@ bool CubeCacheSimple::_init()
     if( !_attr->compute( _file->getnLevels() ) )
         return false;
 
-    const Global& global = Global::getGlobal();
+    const Global& global = IV::getGlobal();
     // Allocate memory
     _numElements = global.getCacheSizeCPU() /
                                     ( _attr->cubeSize * sizeof( float ) );

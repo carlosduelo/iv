@@ -9,19 +9,16 @@
 add_executable( cuthdf5 cutHDF5.cpp )
 target_link_libraries( cuthdf5
                                 IV
-                                ${Boost_LIBRARIES}
                                 )
 
 # Octree Constructor
 add_executable( ivOC octreeConstructor.cpp )
 target_link_libraries( ivOC
                                 IV
-                                ${Boost_LIBRARIES}
                                 )
 
 # hdf5 to ivD
 add_executable( ivh5ToivD hdf5ToivD.cpp )
 target_link_libraries( ivh5ToivD
                                 IV
-                                ${Boost_LIBRARIES}
                                 )

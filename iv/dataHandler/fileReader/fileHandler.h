@@ -10,7 +10,7 @@ Notes:
 #define _IV_FILEHANDLER_H_
 
 #include <iv/common/types.h>
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
 namespace iv
@@ -50,7 +50,7 @@ public:
                            level_t       nLevels
                          ) const
     {
-        const Global& global = Global::getGlobal();
+        const Global& global = IV::getGlobal();
         uint32_t cubeInc = global.getCubeInc();
         const vec3int32_t cubeIncV( cubeInc, cubeInc, cubeInc );
         const int32_t dim = exp2f( nLevels - level );

@@ -10,7 +10,7 @@ Notes:
 #define _IV_CACHE_ATTR_H_
 
 #include <iv/common/types.h>
-#include <iv/common/global.h>
+#include <iv/common/init.h>
 
 #include <iv/dataHandler/types.h>
 
@@ -62,7 +62,7 @@ public:
             return false;
         }
 
-        const Global& global = Global::getGlobal();
+        const Global& global = IV::getGlobal();
         cubeDim  = exp2f( nLevels - cubeLevel );
         cubeSize = powf( cubeDim + 2 * global.getCubeInc(), 3 );
 
