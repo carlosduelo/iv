@@ -150,7 +150,7 @@ bool BrickCache::_init()
 
     const Global& global = IV::getGlobal();
     // Allocate memory
-    _numElements = global.getCacheSizeGPU() /
+    _numElements = ( global.getCacheSizeGPU() * 1024 * 1024 ) /
                                     ( _attr->brickSize * sizeof( float ) );
     if( _numElements == 0 )
     {

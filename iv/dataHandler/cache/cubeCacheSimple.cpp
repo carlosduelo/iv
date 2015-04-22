@@ -35,7 +35,7 @@ bool CubeCacheSimple::_init()
 
     const Global& global = IV::getGlobal();
     // Allocate memory
-    _numElements = global.getCacheSizeCPU() /
+    _numElements = ( global.getCacheSizeCPU() * 1024 * 1024 ) /
                                     ( _attr->cubeSize * sizeof( float ) );
     if( _numElements == 0 )
     {

@@ -12,6 +12,20 @@ Notes:
 
 namespace
 {
+
+void printHelp()
+{
+    std::cout << "Data options:" << std::endl;
+    std::cout << "--file_type:" << std::endl;
+    std::cout << "    hdf5 " << IV_FILE_TYPE_HDF5 << std::endl;
+    std::cout << "    ivD  " << IV_FILE_TYPE_IVD << std::endl;
+    std::cout << "    test " << IV_FILE_TYPE_TEST << std::endl;
+    std::cout << "--data_file:" << std::endl;
+    std::cout << "    hdf5 <file-path> <dataset-name> [ x_grid ] [ y_grid ] [ z_grid ]" << std::endl;
+    std::cout << "    ivD  <file-path>" << std::endl;
+    std::cout << "    test <dimension>" << std::endl;
+}
+
     bool _init = false;
 }
 
@@ -25,46 +39,136 @@ const Global& IV::getGlobal()
 
 bool IV::init( const int ac, char ** av )
 {
+
     if( _init )
         return true;
     _init = true;
 
     Global& global = Global::getInstance();
 
-    // Parsing arguments
-    boost::program_options::options_description desc("Allowed options:");
-    desc.add_options()
-    ("help", "produce help message")
-    ("file-type",
-     boost::program_options::value<DataHandler::file_type_t>()->default_value(IV_FILE_TYPE_HDF5),
-     "Select file type")
+    boost::program_options::options_description cmdOptions;
+
+    // General Options
+    boost::program_options::options_description generalOptions("General options");
+    generalOptions.add_options()
+    ("help", "produce help message");
+
+    // Behavior Options
+    boost::program_options::options_description behaviorOptions("Behavior options");
+    behaviorOptions.add_options()
+    ("disable_cuda", "Disable cuda, by default enabled if available")
+    ("use_hyperthreading", "Set use hyperthreading, by default disabled")
+    ("max_num_threads", boost::program_options::value< uint32_t >(),
+        "Select maximum number of threads")
     ;
+
+    // Data Options
+    boost::program_options::options_description dataOptions("Data options");
+    dataOptions.add_options()
+    ("file_type", boost::program_options::value< DataHandler::file_type_t >(),
+        "Select file type, required")
+    ("data_file", boost::program_options::value< DataHandler::file_args_t >()->multitoken(),
+        "File arguments, required")
+    ("cube_level", boost::program_options::value< level_t >(),
+        "Select cube level")
+    ("brick_level", boost::program_options::value< level_t >(),
+        "Select brick level")
+    ("cube_inc", boost::program_options::value< uint32_t >(),
+        "Select cube inc")
+    ("brick_inc", boost::program_options::value< uint32_t >(),
+        "Select brick inc")
+    ("cube_cache_size", boost::program_options::value< uint32_t >(),
+        "Select cube cache size in MB")
+    ("brick_cache_size", boost::program_options::value< uint32_t >(),
+        "Select brick cache size in MB")
+    ;
+
+    cmdOptions.add(generalOptions).add(behaviorOptions).add(dataOptions);
 
     boost::program_options::variables_map vm;
     try
     {
         boost::program_options::store(
-                boost::program_options::parse_command_line( ac, av, desc ), vm );
+                boost::program_options::parse_command_line( ac, av, cmdOptions ), vm );
         boost::program_options::notify( vm );
     }
     catch(...)
     {
-        std::cout << desc << std::endl;
-        std::cout << "file-type, default value hdf5" << std::endl;
-        std::cout << "    hdf5 " << IV_FILE_TYPE_HDF5 << std::endl;
+        std::cout << cmdOptions << std::endl;
+        printHelp();
         return false;
     }
 
-    if( vm.count( "help" ) ) {
-        std::cout << desc << std::endl;
-        std::cout << "file-type, default value hdf5" << std::endl;
-        std::cout << "    hdf5 " << IV_FILE_TYPE_HDF5 << std::endl;
-        std::cout << "    ivD  " << IV_FILE_TYPE_IVD << std::endl;
+    // General Options
+    if( vm.count( "help" ) )
+    {
+        std::cout << cmdOptions << std::endl;
+        printHelp();
         return false;
     }
 
-    const DataHandler::file_type_t fileType = vm["file-type"].as<DataHandler::file_type_t>();
-    global.setFileType( fileType );
+    // Behavior Options
+#ifdef IV_USE_CUDA
+    if( !vm.count( "disable_cuda" ) )
+        global.useCuda();
+#endif
+    if( vm.count( "use_hyperthreading" ) )
+        global.setHyperThreading();
+
+    if( vm.count( "max_num_threads" ) )
+    {
+        global.setMaxNumThreads( vm["max_num_threads"].as< uint32_t >() );
+    }
+
+    // Data parameters required
+    if( !vm.count( "file_type" ) ||
+        !vm.count( "data_file" ) )
+    {
+        std::cout << cmdOptions << std::endl;
+        printHelp();
+        return false;
+    }
+    else
+    {
+        const DataHandler::file_type_t fileType = vm["file_type"].as<DataHandler::file_type_t>();
+        const DataHandler::file_args_t dataParam = vm["data_file"].as< DataHandler::file_args_t >();
+        switch( fileType )
+        {
+            case IV_FILE_TYPE_HDF5:
+                if( dataParam.size() < 2 )
+                {
+                    std::cout << cmdOptions << std::endl;
+                    printHelp();
+                    return false;
+                }
+                break;
+            case IV_FILE_TYPE_IVD:
+                if( dataParam.size() < 1 )
+                {
+                    std::cout << cmdOptions << std::endl;
+                    printHelp();
+                    return false;
+                }
+                break;
+            case IV_FILE_TYPE_TEST:
+                if( dataParam.size() < 1 )
+                {
+                    std::cout << cmdOptions << std::endl;
+                    printHelp();
+                    return false;
+                }
+                break;
+            default:
+                std::cout << cmdOptions << std::endl;
+                printHelp();
+                return false;
+        }
+
+        global.setFileType( fileType );
+        global.setFileArgs( dataParam );
+    }
+
+    // Data parameters optional
 
     return true;
 }

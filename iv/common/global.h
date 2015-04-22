@@ -22,8 +22,8 @@ friend class IV;
 
 private:
     Global()
-        : _cacheSizeCPU( 1024 * 1024 * 1024 ) // 256 MB
-        , _cacheSizeGPU( 128 * 1024 * 1024 ) // 128 MB
+        : _cacheSizeCPU( 1024 ) // 1024 MB
+        , _cacheSizeGPU( 128 ) // 128 MB
         , _useCuda( false )
         , _maxNumThreads( 8 )
         , _hyperThreading( false )
