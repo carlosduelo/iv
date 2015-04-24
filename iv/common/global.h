@@ -9,9 +9,12 @@ Notes:
 #ifndef _IV_GLOBALS_H_
 #define _IV_GLOBALS_H_
 
-#include <cstdint>
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
+
+#include <cstdint>
+
+#include <set>
 
 namespace iv
 {
@@ -34,6 +37,8 @@ private:
         , _brickLevel( 0 )
         , _brickInc( 2 )
 #endif
+        , _octreeLevel( 0 )
+        , _octreeFile( "" )
     {
     }
 
@@ -85,6 +90,14 @@ public:
     void     setBrickInc( const uint32_t brickInc ) { _brickInc = brickInc; }
     uint32_t getBrickInc() const { return _brickInc; }
 #endif
+    void setOctreeLevel( const level_t octreeLevel ) { _octreeLevel = octreeLevel; }
+    level_t getOctreeLevel() const { return _octreeLevel; }
+
+    void setOctreeFile( const std::string octreeFile ) { _octreeFile = octreeFile; }
+    const std::string getOctreeFile() const { return _octreeFile; }
+
+    void setIsosurfaces( const std::set< float >& isosurfaces ) { _isosurfaces = isosurfaces; }
+    const std::set< float >& getIsosurfaces() const { return _isosurfaces; }
 
 private:
     // Maximum memory allocated on the CPU
@@ -110,6 +123,11 @@ private:
     level_t     _brickLevel;
     uint32_t    _brickInc;
 #endif
+
+    // Octree data
+    level_t             _octreeLevel;
+    std::string         _octreeFile;
+    std::set< float >   _isosurfaces;
 };
 
 }

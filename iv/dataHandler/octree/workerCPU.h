@@ -22,9 +22,9 @@ class WorkerCPU : public Worker
 public:
     WorkerCPU( DataWarehousePtr& data,
                CachePtr& cache,
-               const OctreeConstructorAttrPtr& attr,
+               const level_t readLevel,
                OctreeConstructorStats& stats )
-        : Worker( data, cache, attr, stats )
+        : Worker( data, cache, readLevel, stats )
     {
     }
 

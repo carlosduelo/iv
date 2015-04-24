@@ -8,6 +8,8 @@ Notes:
 
 #include <iv/common/init.h>
 
+#include <iv/dataHandler/fileReader/factoryFileHandler.h>
+
 #include <boost/program_options.hpp>
 
 namespace
@@ -81,6 +83,12 @@ bool IV::init( const int ac, char ** av )
         "Select cube cache size in MB")
     ("brick_cache_size", boost::program_options::value< uint32_t >(),
         "Select brick cache size in MB")
+    ("octree_file", boost::program_options::value< std::string >(),
+        "Octree file")
+    ("octree_level", boost::program_options::value< level_t >(),
+        "Select octree level, by default equal to nLevels")
+    ("isos", boost::program_options::value< std::vector< float > >()->multitoken(),
+        "Set of Isosurfaces")
     ;
 
     cmdOptions.add(generalOptions).add(behaviorOptions).add(dataOptions);
@@ -168,7 +176,62 @@ bool IV::init( const int ac, char ** av )
         global.setFileArgs( dataParam );
     }
 
+    DataHandler::FileHandlerPtr file =
+        DataHandler::FactoryFileHandler::CreateFileHandler( global.getFileType(),
+                                                            global.getFileArgs() );
+    if( !file )
+        return false;
+
+    const level_t nLevels = file->getnLevels();
+    global.setnLevels( nLevels );
+
     // Data parameters optional
+    if( vm.count( "cube_inc" ) )
+         global.setCubeInc( vm["cube_inc"].as< uint32_t >() );
+
+    if( vm.count( "brick_inc" ) )
+         global.setBrickInc( vm["brick_inc"].as< uint32_t >() );
+
+    if( vm.count( "cube_cache_size" ) )
+        global.setCacheSizeCPU( vm["cube_cache_size"].as< uint32_t >() );
+
+    if( vm.count( "brick_cache_size" ) )
+        global.setCacheSizeGPU( vm["brick_cache_size"].as< uint32_t >() );
+
+    if( vm.count( "cube_level" ) )
+         global.setCubeLevel( vm["cube_level"].as< level_t >() );
+    else // By default 64
+         global.setCubeLevel( nLevels - 6 );
+
+#ifdef IV_USE_CUDA
+    if( vm.count( "brick_level" ) )
+         global.setBrickLevel( vm["brick_level"].as< level_t >() );
+    else // By default 32
+         global.setBrickLevel( nLevels - 5 );
+
+    if( global.getBrickLevel() < global.getCubeLevel() )
+    {
+        std::cout << "Brick level must be >= Cube level" << std::endl;
+        std::cout << cmdOptions << std::endl;
+        printHelp();
+    }
+#endif
+    if( vm.count( "octree_file" ) )
+    {
+        global.setOctreeFile( vm["octree_file"].as< std::string >() );
+    }
+
+    if( vm.count( "octree_level" ) )
+         global.setBrickLevel( vm["octree_level"].as< level_t >() );
+    else // By default nLevels
+         global.setBrickLevel( nLevels );
+
+    if( vm.count( "isos" ) )
+    {
+        std::vector< float > i = vm["isos"].as< std::vector< float > >();
+        std::set< float > isos( i.begin(), i.end() );
+        global.setIsosurfaces( isos );
+    }
 
     return true;
 }

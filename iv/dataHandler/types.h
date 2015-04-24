@@ -28,16 +28,11 @@ namespace DataHandler
 // Cube Cache Implementations
 #define IV_CUBE_CACHE_SIMPLE 0
 
-// Octree types
-#define IV_OCTREE_SINGLE 0
-#define IV_OCTREE_RANGE  1
-
 typedef uint32_t                    file_type_t;
 typedef std::vector< std::string >  file_args_t;
 
 typedef uint32_t                    cache_type_t;
 typedef uint32_t                    cube_cache_impl_t;
-typedef uint32_t                    octree_type_t;
 
 class Cache;
 class CacheAttr;

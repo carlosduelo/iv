@@ -12,7 +12,6 @@ Notes:
 #include <iv/common/types.h>
 #include <iv/dataHandler/types.h>
 #include <iv/dataHandler/util/queue.hpp>
-#include <iv/dataHandler/octree/octreeConstructorAttr.h>
 #include <iv/dataHandler/octree/octreeConstructorStats.h>
 #include <iv/dataHandler/octree/worker.h>
 #include <iv/dataHandler/octree/dataWarehouse.h>
@@ -28,11 +27,10 @@ namespace DataHandler
 class OctreeConstructor
 {
 public:
-    OctreeConstructor( const OctreeConstructorAttrPtr& octree,
+    OctreeConstructor( const level_t constructorLevel,
                        const index_node_t cube )
-               : _octree( octree )
+               : _constructorLevel( constructorLevel )
                , _cube( cube )
-               , _nLevels( 0 )
     {
     }
 
@@ -50,15 +48,9 @@ public:
         return _dataWarehouse;
     }
 
-    level_t getnLevels() const
-    {
-        return _nLevels;
-    }
-
 protected:
-    const OctreeConstructorAttrPtr  _octree;
+    const level_t                   _constructorLevel;
     const index_node_t              _cube;
-    level_t                         _nLevels;
 
     DataWarehousePtr                _dataWarehouse;
     std::vector< WorkerPtr >        _workers;

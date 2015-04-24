@@ -94,9 +94,9 @@ const float * IVDFileHandler::getzGrid( ) const
 }
 
 void IVDFileHandler::readCube( float * const data,
-                               index_node_t  id,
-                               level_t       level,
-                               level_t       nLevels
+                               const index_node_t  id,
+                               const level_t       level,
+                               const level_t       nLevels
                              ) const
 {
     if( nLevels != _nLevels || level != _level )

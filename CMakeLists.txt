@@ -57,7 +57,7 @@ add_subdirectory(util)
 add_subdirectory(bench)
 
 # Compile test
-add_subdirectory(test)
+# add_subdirectory(test)
 
 # Compile perf
 #add_subdirectory(perf)

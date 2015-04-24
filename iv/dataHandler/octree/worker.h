@@ -26,11 +26,11 @@ class Worker
 public:
     Worker( DataWarehousePtr& data,
             CachePtr& cache,
-            const OctreeConstructorAttrPtr& attr,
+            const level_t readLevel,
             OctreeConstructorStats& stats )
         : _cache( cache )
         , _data( data )
-        , _attr( attr )
+        , _readLevel( readLevel )
         , _stats( stats )
     {
     }
@@ -46,7 +46,7 @@ public:
 protected:
     CachePtr                            _cache;
     DataWarehousePtr                    _data;
-    const OctreeConstructorAttrPtr      _attr;
+    const level_t                       _readLevel;
     OctreeConstructorStats&             _stats;
     std::vector< index_node_t >         _cubes;
 

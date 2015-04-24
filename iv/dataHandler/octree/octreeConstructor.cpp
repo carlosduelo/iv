@@ -27,55 +27,35 @@ namespace DataHandler
 
 bool OctreeConstructor::compute()
 {
-    if( _octree->getConstructorLevel() > _octree->getLevel() )
-    {
-        std::cerr << "Contructor level may be <= octree level" << std::endl;
-        return false;
-    }
-    if( _octree->getConstructorLevel() > _octree->getReadLevel() )
-    {
-        std::cerr << "Contructor level may be <= read level" << std::endl;
-        return false;
-    }
+    const Global& global = IV::getGlobal();
 
-    if( _octree->getReadLevel() > _octree->getLevel() )
-    {
-        std::cerr << "Read level may be <= octree level" << std::endl;
-        return false;
-    }
+    level_t readLevel = 0;
+#ifdef IV_USE_CUDA
+    if( global.useCuda() )
+        readLevel = global.getBrickLevel();
+    else
+#endif
+    readLevel = global.getCubeLevel();
 
     index_node_t idStart =
             _cube <<
-            3 * ( _octree->getReadLevel() - _octree->getConstructorLevel() );
+            3 * ( readLevel - _constructorLevel );
     index_node_t idFinish =
             ( ( _cube + 1 ) <<
-            3 * ( _octree->getReadLevel() - _octree->getConstructorLevel() ) ) - 1;
+            3 * ( readLevel - _constructorLevel ) ) - 1;
 
     index_node_t min =
             _cube <<
-            3 * ( _octree->getLevel() - _octree->getConstructorLevel() );
+            3 * ( global.getOctreeLevel() - _constructorLevel );
     index_node_t max =
             ( ( _cube + 1 ) <<
-            3 * ( _octree->getLevel() - _octree->getConstructorLevel() ) ) - 1;
+            3 * ( global.getOctreeLevel() - _constructorLevel ) ) - 1;
 
     // Create DataWarehouse
     _dataWarehouse = DataWarehousePtr( new DataWarehouse( min, max ) );
 
-    const Global& global = IV::getGlobal();
     // Create Cache
     CacheAttrPtr cacheAttr( new iv::DataHandler::CacheAttr() );
-
-    cacheAttr->file_type = _octree->getFileType();
-    cacheAttr->file_args = _octree->getFileArgs();
-
-    cacheAttr->cubeLevel = _octree->getReadLevel();
-
-#ifdef IV_USE_CUDA
-    if( global.useCuda() )
-    {
-        cacheAttr->brickLevel = _octree->getReadLevel();
-    }
-#endif
 
     CachePtr cache( new iv::DataHandler::Cache( ) );
 
@@ -117,8 +97,6 @@ bool OctreeConstructor::compute()
     if( !data.wasFine )
         return false;
 
-    _nLevels = cache->getnLevels();
-
     bool wasFine = true;
     if( global.useHyperThreading() )
     {
@@ -127,8 +105,8 @@ bool OctreeConstructor::compute()
         {
             // Check cube is outside of volume
             vec3int32_t coordCubeStart = getMinBoxIndex2( id,
-                    _octree->getReadLevel(),
-                    cache->getnLevels() );
+                                                          readLevel,
+                                                          global.getnLevels() );
 
             if( coordCubeStart.x() < cache->getRealDimension().x()  &&
                 coordCubeStart.y() < cache->getRealDimension().y()  &&
@@ -138,13 +116,13 @@ bool OctreeConstructor::compute()
                 if( global.useCuda() )
                     _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                                   cache,
-                                                                  _octree,
+                                                                  readLevel,
                                                                   _stats ) ) );
                 else
 #endif
                     _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                                   cache,
-                                                                  _octree,
+                                                                  readLevel,
                                                                   _stats ) ) );
                 _workers[ worker ]->addCube( id );
                 worker++;
@@ -158,8 +136,8 @@ bool OctreeConstructor::compute()
         {
             // Check cube is outside of volume
             vec3int32_t coordCubeStart = getMinBoxIndex2( id,
-                    _octree->getReadLevel(),
-                    cache->getnLevels() );
+                    readLevel,
+                    global.getnLevels() );
 
             if( coordCubeStart.x() < cache->getRealDimension().x()  &&
                 coordCubeStart.y() < cache->getRealDimension().y()  &&
@@ -178,20 +156,20 @@ bool OctreeConstructor::compute()
             if( global.useCuda() )
                 _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                               cache,
-                                                              _octree,
+                                                              readLevel,
                                                               _stats ) ) );
 #endif
             else
                 _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
                                                               cache,
-                                                              _octree,
+                                                              readLevel,
                                                               _stats ) ) );
             uint32_t cubes = 0;
             while( cubes <= eachThread && id <= idFinish )
             {
                 vec3int32_t coordCubeStart = getMinBoxIndex2( id,
-                        _octree->getReadLevel(),
-                        cache->getnLevels() );
+                        readLevel,
+                        global.getnLevels() );
 
                 if( coordCubeStart.x() < cache->getRealDimension().x()  &&
                     coordCubeStart.y() < cache->getRealDimension().y()  &&

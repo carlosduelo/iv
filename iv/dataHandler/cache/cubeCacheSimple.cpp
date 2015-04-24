@@ -25,15 +25,13 @@ namespace DataHandler
 {
 bool CubeCacheSimple::_init()
 {
-    _file =  FactoryFileHandler::CreateFileHandler( _attr->file_type,
-                                                    _attr->file_args );
+    const Global& global = IV::getGlobal();
+
+    _file =  FactoryFileHandler::CreateFileHandler( global.getFileType(),
+                                                    global.getFileArgs() );
     if( !_file )
         return false;
 
-    if( !_attr->compute( _file->getnLevels() ) )
-        return false;
-
-    const Global& global = IV::getGlobal();
     // Allocate memory
     _numElements = ( global.getCacheSizeCPU() * 1024 * 1024 ) /
                                     ( _attr->cubeSize * sizeof( float ) );
@@ -65,21 +63,18 @@ void CubeCacheSimple::_stop()
 void CubeCacheSimple::_readProcess( const CacheObjectPtr& obj,
                               const LRULinkedList::node_ref data )
 {
+    const Global& global = IV::getGlobal();
     _file->readCube( ( float* ) data.get(),
                      obj->getID(),
-                     _attr->cubeLevel,
-                     _file->getnLevels() );
+                     global.getCubeLevel(),
+                     global.getnLevels() );
+
     obj->setState( CacheObject::CACHED );
 }
 
 const vec3int32_t& CubeCacheSimple::getRealDimension() const
 {
     return _file->getRealDimension();
-}
-
-level_t CubeCacheSimple::getnLevels() const
-{
-    return _file->getnLevels();
 }
 
 const float * CubeCacheSimple::getGridX() const

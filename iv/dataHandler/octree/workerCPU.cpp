@@ -11,7 +11,6 @@ Notes:
 #include <iv/dataHandler/cache/cache.h>
 #include <iv/dataHandler/cache/objectHandler.h>
 
-#include <iv/dataHandler/octree/octreeConstructorAttr.h>
 #include <iv/dataHandler/octree/dataWarehouse.h>
 
 #include <iv/common/init.h>
@@ -54,8 +53,8 @@ bool WorkerCPU::_computeCube( const index_node_t cube )
 {
     const Global& global = IV::getGlobal();
     const float bytesRead = powf(
-                            exp2( _cache->getnLevels() -
-                                  _attr->getReadLevel() ) + 2 * global.getCubeInc(), 3 ) *
+                            exp2( global.getnLevels() -
+                                  _readLevel ) + 2 * global.getCubeInc(), 3 ) *
                           sizeof(float);
     auto startR = std::chrono::high_resolution_clock::now();
         ObjectHandlerPtr o = _cache->get( cube );
@@ -81,20 +80,20 @@ bool WorkerCPU::_computeCube( const index_node_t cube )
 void WorkerCPU::_computeCubeData( const index_node_t id,
                                                 const float * cube )
 {
-    index_node_t idS = id <<
-                       3 * ( _attr->getLevel() - _attr->getReadLevel() );
-    index_node_t idE = (id + 1) <<
-                       3 * ( _attr->getLevel() - _attr->getReadLevel() );
-
     const Global& global = IV::getGlobal();
-    const uint32_t dimCube = exp2f(
-                               _cache->getnLevels() - _attr->getLevel() );
-    const uint32_t dimCubeData = exp2f(
-                                   _cache->getnLevels() -
-                                   _attr->getReadLevel() ) + 2 * global.getCubeInc();
 
-    const vec3int32_t coordData = getMinBoxIndex2( id, _attr->getReadLevel(),
-                                                    _cache->getnLevels() );
+    index_node_t idS = id <<
+                       3 * ( global.getOctreeLevel() - _readLevel );
+    index_node_t idE = (id + 1) <<
+                       3 * ( global.getOctreeLevel() - _readLevel );
+
+    const uint32_t dimCube = exp2f(
+                               global.getnLevels() - global.getOctreeLevel() );
+    const uint32_t dimCubeData = exp2f( global.getnLevels() - _readLevel ) + 2 * global.getCubeInc();
+
+    const vec3int32_t coordData = getMinBoxIndex2( id,
+                                                   _readLevel,
+                                                   global.getnLevels() );
 
     for( index_node_t i = idS; i < idE; i++ )
     {
@@ -102,8 +101,8 @@ void WorkerCPU::_computeCubeData( const index_node_t id,
         {
             _data->pushCube( i );
             // Update MaxHeight
-            vec3int32_t coord = getMinBoxIndex2( i, _attr->getLevel(),
-                                                    _cache->getnLevels() );
+            vec3int32_t coord = getMinBoxIndex2( i, global.getOctreeLevel(),
+                                                    global.getnLevels() );
             _data->updateMaxHeight( coord.y() );
         }
     }
@@ -115,11 +114,12 @@ bool WorkerCPU::_computeCube( const index_node_t    id,
                               const vec3int32_t     coordStartData,
                               const uint32_t        dimCubeData )
 {
-    vec3int32_t coordStart = getMinBoxIndex2( id,
-                                              _attr->getLevel(),
-                                              _cache->getnLevels() );
-    vec3int32_t coordEnd = coordStart + vec3int32_t( dimCube, dimCube, dimCube );
     const Global& global = IV::getGlobal();
+
+    vec3int32_t coordStart = getMinBoxIndex2( id,
+                                              global.getOctreeLevel(),
+                                              global.getnLevels() );
+    vec3int32_t coordEnd = coordStart + vec3int32_t( dimCube, dimCube, dimCube );
     const uint32_t cubeInc = global.getCubeInc();
 
     const int32_t iS = coordStart.x() + cubeInc - coordStartData.x();
@@ -133,12 +133,11 @@ bool WorkerCPU::_computeCube( const index_node_t    id,
         for( int32_t j = jS; j < jE; j++ )
             for( int32_t k = kS; k < kE; k++ )
             {
-                for( auto iso = _attr->getIsosurfaces().begin();
-                          iso != _attr->getIsosurfaces().end();
+                for( auto iso = global.getIsosurfaces().begin();
+                          iso != global.getIsosurfaces().end();
                           iso++ )
                 {
-                    if( checkIsosurface( i, j, k,
-                                                    dimCubeData, cube, *iso ) )
+                    if( checkIsosurface( i, j, k, dimCubeData, cube, *iso ) )
                         return true;
                 }
             }

@@ -45,9 +45,9 @@ public:
     virtual const float * getzGrid( ) const = 0;
 
     virtual void readCube( float * const data,
-                           index_node_t  id,
-                           level_t       level,
-                           level_t       nLevels
+                           const index_node_t  id,
+                           const level_t       level,
+                           const level_t       nLevels
                          ) const
     {
         const Global& global = IV::getGlobal();

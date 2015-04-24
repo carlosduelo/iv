@@ -22,8 +22,8 @@ namespace DataHandler
 class OctreeGen
 {
 public:
-    OctreeGen( const OctreeGenAttrPtr& attr )
-        : _attr( attr )
+    OctreeGen( const level_t constructorLevel )
+        : _constructorLevel( constructorLevel )
     {
     }
 
@@ -32,7 +32,7 @@ public:
     void printStats() const;
 
 private:
-    const OctreeGenAttrPtr      _attr;
+    const level_t               _constructorLevel;
     std::vector< index_node_t > _cubes;
     OctreeConstructorStats      _stats;
 };

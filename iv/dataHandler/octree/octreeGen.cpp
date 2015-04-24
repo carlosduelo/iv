@@ -42,12 +42,11 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
     // Sort cubes
     std::sort( cubes.begin(), cubes.end() );
 
-    OctreeConstructorAttrPtr attr( new OctreeConstructorAttr( _attr ) );
-
     std::vector< OctreeConstructorPtr > constructors;
     constructors.resize( cubes.size() );
     for( uint32_t i = 0; i < cubes.size(); i++ )
-        constructors[i].reset( new OctreeConstructor( attr, cubes[i] ) );
+        constructors[i].reset( new OctreeConstructor( _constructorLevel,
+                                                      cubes[i] ) );
 
     for( auto c = constructors.begin(); c != constructors.end(); ++c )
         (*c)->compute();
@@ -72,12 +71,13 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
                         : maxHeight;
     }
 
-    // Write to file
-    std::ofstream file( _attr->getFilePath().c_str(), std::ofstream::binary );
-
     const Global& global = IV::getGlobal();
-    level_t nLevels = (*constructors.begin())->getnLevels();
-    level_t level = _attr->getLevel();
+
+    // Write to file
+    std::ofstream file( global.getOctreeFile().c_str(), std::ofstream::binary );
+
+    level_t nLevels = global.getnLevels();
+    level_t level = global.getOctreeLevel();
     uint32_t cubeInc = global.getCubeInc();
     file.write( (char*)&nLevels, sizeof( nLevels ) );
     file.write( (char*)&level, sizeof( level ) );

@@ -35,8 +35,10 @@ void Reader::start()
 
 void Reader::_read()
 {
+    const Global& global = IV::getGlobal();
+
     // Get cube from cube cache
-    index_node_t cubeID = _obj->getID() >> 3 * (_attr->brickLevel - _attr->cubeLevel);
+    index_node_t cubeID = _obj->getID() >> 3 * ( global.getBrickLevel() - global.getCubeLevel() );
     const ObjectHandlerPtr objData = _cubeCache->get( cubeID );
     const float* cubeData = objData->lock();
 
@@ -71,17 +73,16 @@ void Reader::_read()
         return;
     }
     vec3int32_t coord = getMinBoxIndex2( _obj->getID(),
-                                         _attr->brickLevel,
-                                         _cubeCache->getnLevels() );
+                                         global.getBrickLevel(),
+                                         global.getnLevels() );
     vec3int32_t coordC = getMinBoxIndex2( cubeID,
-                                          _attr->cubeLevel,
-                                          _cubeCache->getnLevels() );
+                                          global.getCubeLevel(),
+                                          global.getnLevels() );
 
     std::cout << _obj->getID()<<" brick "<<coord << std::endl;
     std::cout << cubeID <<" cube "<<coordC << std::endl;
     coord -= coordC;
 
-    const Global& global = IV::getGlobal();
     int32_t dimCube  = _attr->cubeDim + 2 * global.getCubeInc();
     int32_t dimBrick = _attr->brickDim + 2 * global.getBrickInc();
 
@@ -135,10 +136,7 @@ bool BrickCache::_init()
 {
     // Create Cube Cache
     _cubeCache.reset( CreateCubeCache( _attr->cubeCacheImpl ) );
-    if( !_cubeCache )
-        return false;
-    assert( _cubeCache->getnLevels() != 0 );
-    if( !_cubeCache->init( _attr ) )
+    if( !_cubeCache && !_cubeCache->init( _attr ) )
         return false;
 
     if( cudaSuccess != cudaSetDevice( _attr->deviceID ) )
@@ -252,11 +250,6 @@ void BrickCache::_finishRead( const CacheObjectPtr& obj, const bool valid )
 const vec3int32_t& BrickCache::getRealDimension() const
 {
     return _cubeCache->getRealDimension();
-}
-
-level_t  BrickCache::getnLevels() const
-{
-    return _cubeCache->getnLevels();
 }
 
 }

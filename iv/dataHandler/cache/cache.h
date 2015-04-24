@@ -38,11 +38,6 @@ public:
         return _cache->getRealDimension();
     }
 
-    level_t getnLevels() const
-    {
-        return _cache->getnLevels();
-    }
-
     const float * getGridX() const
     {
         return _cache->getGridX();
