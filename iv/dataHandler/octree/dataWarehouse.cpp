@@ -29,7 +29,7 @@ bool DataWarehouse::start()
 {
     // Create Files
     index_node_t current = _min;
-    while( current < _max )
+    while( current <= _max )
     {
         _indices.push_back( current );
         _dimensions.push_back( 0 );

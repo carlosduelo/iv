@@ -37,7 +37,21 @@ void OctreeGen::printStats() const
 bool OctreeGen::compute( std::vector< index_node_t >& cubes )
 {
     if( cubes.size() == 0 )
-        return true;
+        return false;
+
+    const Global& global = IV::getGlobal();
+
+    if( global.getOctreeFile() == "" )
+    {
+        std::cerr << "No octree file specified" << std::endl;
+        return false;
+    }
+
+    if( global.getIsosurfaces().size() == 0 )
+    {
+        std::cerr << "Not isosurfaces provided" << std::endl;
+        return false;
+    }
 
     // Sort cubes
     std::sort( cubes.begin(), cubes.end() );
@@ -70,8 +84,6 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
                         ? (*c)->getData()->getMaxHeight()
                         : maxHeight;
     }
-
-    const Global& global = IV::getGlobal();
 
     // Write to file
     std::ofstream file( global.getOctreeFile().c_str(), std::ofstream::binary );

@@ -39,6 +39,7 @@ private:
 #endif
         , _octreeLevel( 0 )
         , _octreeFile( "" )
+        , _outputFile( "" )
     {
     }
 
@@ -99,6 +100,9 @@ public:
     void setIsosurfaces( const std::set< float >& isosurfaces ) { _isosurfaces = isosurfaces; }
     const std::set< float >& getIsosurfaces() const { return _isosurfaces; }
 
+    void setOutputFile( const std::string file ) { _outputFile = file; }
+    const std::string getOutputFile() const { return _outputFile; }
+
 private:
     // Maximum memory allocated on the CPU
     uint32_t    _cacheSizeCPU;
@@ -128,6 +132,9 @@ private:
     level_t             _octreeLevel;
     std::string         _octreeFile;
     std::set< float >   _isosurfaces;
+
+    // Other
+    std::string         _outputFile;
 };
 
 }

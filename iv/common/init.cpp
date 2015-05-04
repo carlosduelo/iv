@@ -91,7 +91,14 @@ bool IV::init( const int ac, char ** av )
         "Set of Isosurfaces")
     ;
 
-    cmdOptions.add(generalOptions).add(behaviorOptions).add(dataOptions);
+    // Other  Options
+    boost::program_options::options_description otherOptions("Other options");
+    otherOptions.add_options()
+    ("output_file", boost::program_options::value< std::string >(),
+        "Output file")
+    ;
+
+    cmdOptions.add(generalOptions).add(behaviorOptions).add(dataOptions).add(otherOptions);
 
     boost::program_options::variables_map vm;
     try
@@ -217,14 +224,13 @@ bool IV::init( const int ac, char ** av )
     }
 #endif
     if( vm.count( "octree_file" ) )
-    {
         global.setOctreeFile( vm["octree_file"].as< std::string >() );
-    }
+
 
     if( vm.count( "octree_level" ) )
-         global.setBrickLevel( vm["octree_level"].as< level_t >() );
+         global.setOctreeLevel( vm["octree_level"].as< level_t >() );
     else // By default nLevels
-         global.setBrickLevel( nLevels );
+         global.setOctreeLevel( nLevels );
 
     if( vm.count( "isos" ) )
     {
@@ -232,6 +238,9 @@ bool IV::init( const int ac, char ** av )
         std::set< float > isos( i.begin(), i.end() );
         global.setIsosurfaces( isos );
     }
+
+    if( vm.count("output_file" ) )
+        global.setOutputFile( vm["output_file"].as< std::string >() );
 
     return true;
 }

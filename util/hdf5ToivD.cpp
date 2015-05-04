@@ -24,35 +24,37 @@ namespace iv
 namespace util
 {
 
-void createivD( const int argc, char ** const argv )
+void createivD( )
 {
-    if( argc < 4 )
+    const Global& global = IV::getGlobal();
+
+    level_t level = global.getCubeLevel();
+    int32_t cubeInc = global.getCubeInc();
+    if( global.getFileType() != IV_FILE_TYPE_HDF5 )
     {
+        std::cerr << "Provide hdf5 file" << std::endl;
         return;
     }
 
-    const Global& global = IV::getGlobal();
-
-    level_t level = 7;
-    int32_t cubeInc = global.getCubeInc();
-    DataHandler::file_type_t file_type = IV_FILE_TYPE_HDF5;;
-    DataHandler::file_args_t file_args;
-    file_args.push_back( argv[1] );
-    file_args.push_back( argv[2] );
-    std::string file_path( argv[3] );
+    if( global.getOutputFile() == "" )
+    {
+        std::cerr << "Provide output file" << std::endl;
+        return;
+    }
+    std::string file_path( global.getOutputFile() );
 
     // Open File
     DataHandler::FileHandlerPtr file =
-            DataHandler::FactoryFileHandler::CreateFileHandler( file_type,
-                                                                file_args );
+            DataHandler::FactoryFileHandler::CreateFileHandler( global.getFileType(),
+                                                                global.getFileArgs() );
     if( !file )
     {
-        std::cerr << "Error opening file " << argv[1] << std::endl;
+        std::cerr << "Error opening file " << std::endl;
         return;
     }
 
     const vec3int32_t& dimension = file->getRealDimension();
-    level_t nLevels = file->getnLevels();
+    level_t nLevels = global.getnLevels();
 
     // Write to file
     std::ofstream fileO( file_path.c_str(), std::ofstream::out | std::ofstream::binary );
@@ -200,7 +202,7 @@ int main( int argc, char ** argv )
     if( !iv::IV::init( argc, argv ) )
         return 0;
 
-    iv::util::createivD( argc, argv );
+    iv::util::createivD();
 
     iv::IV::exit();
 

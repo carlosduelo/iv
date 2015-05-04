@@ -74,9 +74,6 @@ bool IVDFileHandler::init( const file_args_t& file_params )
     const uint32_t dim = exp2f( _nLevels - _level );
     _cubeSize = powf( dim + 2 * _cubeInc, 3 );
 
-    std::cout << _nLevels << " " << _level << std::endl;
-    std::cout << _realDimension << std::endl;
-
     return true;
 }
 
