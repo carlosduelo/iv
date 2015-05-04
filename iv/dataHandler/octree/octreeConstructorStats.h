@@ -26,6 +26,7 @@ public:
         , _cubesComputed( 0 )
         , _readingTime( 0 )
         , _computingTime( 0 )
+        , _sortingTime( 0 )
     {
     }
 

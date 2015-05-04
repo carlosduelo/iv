@@ -24,14 +24,22 @@ namespace DataHandler
 void OctreeGen::printStats() const
 {
     std::cout << "Octree Construction Stats:" << std::endl;
-    std::cout << "\tData read: " << _stats.getBytesRead() / 1024 / 1024 << " MB" << std::endl;
+    std::cout << "\tData read: " << _stats.getBytesRead() / 1024.0 / 1024.0
+              << " MB" << std::endl;
     std::cout << "\tCubes computed: " << _stats.getCubesComputed() << std::endl;
-    std::cout << "\tTime Reading: " << _stats.getReadingTime().count() / 1000 << " sec" << std::endl;
+    std::cout << "\tTime Reading: " << _stats.getReadingTime().count() /
+                                       1000.0
+              << " sec" << std::endl;
     std::cout << "\tBandwidth: "
-              << ( _stats.getBytesRead() / 1024 / 1024 ) / _stats.getReadingTime().count() / 1000
+              << ( _stats.getBytesRead() / 1024.0 / 1024.0 ) /
+                 ( _stats.getReadingTime().count() / 1000.0 )
               << " MB/s" << std::endl;
-    std::cout << "\tTime Computing: " << _stats.getComputingTime().count() / 1000 << " sec" << std::endl;
-    std::cout << "\tTime Sorting: " << _stats.getSortingTime().count() / 1000 << " sec" << std::endl;
+    std::cout << "\tTime Computing: " << _stats.getComputingTime().count() /
+                                         1000.0
+              << " sec" << std::endl;
+    std::cout << "\tTime Sorting: " << _stats.getSortingTime().count() /
+                                       1000.0
+              << " sec" << std::endl;
 }
 
 bool OctreeGen::compute( std::vector< index_node_t >& cubes )
@@ -90,7 +98,7 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
 
     level_t nLevels = global.getnLevels();
     level_t level = global.getOctreeLevel();
-    uint32_t cubeInc = global.getCubeInc();
+    const uint32_t cubeInc = global.getCubeInc();
     file.write( (char*)&nLevels, sizeof( nLevels ) );
     file.write( (char*)&level, sizeof( level ) );
     file.write( (char*)&maxHeight, sizeof( maxHeight ) );
