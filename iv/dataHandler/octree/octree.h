@@ -40,7 +40,11 @@ public:
 
     const std::string& getFilePath() const { return _filePath; }
 
-    uint32_t getMaxHeght() const { return _maxHeight; }
+    uint32_t getMaxHeight() const { return _maxHeight; }
+
+    const std::vector< index_node_t * >& getData() const { return _octree; }
+
+    const std::vector< uint32_t >& getSizes() const { return _sizes; }
 
 private:
     level_t _nLevels;
@@ -51,6 +55,13 @@ private:
     const std::string _filePath;
 
     uint32_t      _maxHeight;
+
+    std::vector< index_node_t* > _octree;
+    std::vector< uint32_t >      _sizes;
+
+    char *  _startFile;
+    int     _fileD;
+    size_t  _lengthFile;
 };
 
 }

@@ -17,6 +17,11 @@ target_link_libraries( ivOC
                                 IV
                                 )
 
+# Octree Stats
+add_executable( ivOctreeStats octreeStats.cpp )
+target_link_libraries( ivOctreeStats
+                                IV
+                                )
 # hdf5 to ivD
 add_executable( ivh5ToivD hdf5ToivD.cpp )
 target_link_libraries( ivh5ToivD

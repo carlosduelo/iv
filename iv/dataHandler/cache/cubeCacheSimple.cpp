@@ -27,6 +27,12 @@ bool CubeCacheSimple::_init()
 {
     const Global& global = IV::getGlobal();
 
+    if( global.getFileType() == IV_FILE_TYPE_UNKNOWN )
+    {
+        std::cerr << "Provide a data file" << std::endl;
+        return false;
+    }
+
     _file =  FactoryFileHandler::CreateFileHandler( global.getFileType(),
                                                     global.getFileArgs() );
     if( !_file )

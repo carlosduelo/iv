@@ -7,7 +7,6 @@ Notes:
  */
 
 #include <iv/common/init.h>
-#include <iv/common/global.h>
 
 #include <iv/dataHandler/octree/octreeGen.h>
 

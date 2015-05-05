@@ -23,24 +23,24 @@ namespace DataHandler
 bool IVDFileHandler::init( const file_args_t& file_params )
 {
     struct stat sb;
-    _fileD = open(file_params[0].c_str(), O_RDONLY);
+    _fileD = ::open( file_params[0].c_str(), O_RDONLY );
     if( _fileD == -1 )
     {
-        perror("open");
+        ::perror("open");
         return false;
     }
 
-    if( fstat( _fileD, &sb ) == -1 )
+    if( ::fstat( _fileD, &sb ) == -1 )
     {
-        perror("fstat");
+        ::perror("fstat");
         return false;
     }
     _lengthFile = sb.st_size;
 
-    _startFile = (char*) mmap(NULL, _lengthFile, PROT_READ, MAP_PRIVATE, _fileD, 0);
+    _startFile = (char*) ::mmap(NULL, _lengthFile, PROT_READ, MAP_PRIVATE, _fileD, 0);
     if( _startFile == MAP_FAILED )
     {
-        perror("mmap");
+        ::perror("mmap");
         return false;
     }
 
@@ -102,7 +102,7 @@ void IVDFileHandler::readCube( float * const data,
         return;
     }
 
-    memcpy( data, _cubes + (size_t)_offsets[ id - _idStart ] * _cubeSize, _cubeSize * sizeof( float ) );
+    ::memcpy( data, _cubes + (size_t)_offsets[ id - _idStart ] * _cubeSize, _cubeSize * sizeof( float ) );
 }
 
 void IVDFileHandler::read( float * const,
@@ -115,7 +115,7 @@ void IVDFileHandler::read( float * const,
 
 void IVDFileHandler::_close( )
 {
-    munmap( _startFile, _lengthFile );
+    ::munmap( _startFile, _lengthFile );
     ::close( _fileD );
 }
 

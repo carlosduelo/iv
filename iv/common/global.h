@@ -30,6 +30,7 @@ private:
         , _useCuda( false )
         , _maxNumThreads( 8 )
         , _hyperThreading( false )
+        , _file_type( 0 )
         , _nLevels( 0 )
         , _cubeLevel( 0 )
         , _cubeInc( 2 )
