@@ -28,7 +28,9 @@ public:
     {
     }
 
-    octree_type_t getOctreeType() const { return _octreeType; }
+    bool open();
+
+    void close();
 
     level_t getLevel() const { return _level; }
 
@@ -41,8 +43,6 @@ public:
     uint32_t getMaxHeght() const { return _maxHeight; }
 
 private:
-    octree_type_t _octreeType;
-
     level_t _nLevels;
     level_t _level;
 

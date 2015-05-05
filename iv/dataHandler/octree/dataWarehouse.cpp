@@ -124,9 +124,10 @@ void DataWarehouse::_fileToVector( std::ifstream& file,
     file.read( (char*) vector.data(), dim * sizeof( index_node_t ) );
 }
 
-void DataWarehouse::_sortVector( std::vector< index_node_t >& vector )
+void DataWarehouse::_sortVector( std::vector< index_node_t >& vector,
+                                 const uint32_t dim )
 {
-    std::sort( vector.begin(), vector.end() );
+    std::sort( vector.begin(), vector.begin() + dim );
 }
 
 void DataWarehouse::_vectorToFile( std::ofstream&   file,
@@ -173,7 +174,7 @@ void DataWarehouse::_sort()
 
         std::ifstream file( _nameTmpFiles[i].c_str(), std::ofstream::binary );
         _fileToVector( file, buffer, _dimensions[i] );
-        _sortVector( buffer );
+        _sortVector( buffer, _dimensions[i] );
         _vectorToFile( endFile, buffer, _dimensions[i] );
         file.close();
     }

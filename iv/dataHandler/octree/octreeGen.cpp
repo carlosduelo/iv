@@ -15,6 +15,80 @@ Notes:
 
 #include <algorithm>
 
+namespace
+{
+
+class OctreeComplete
+{
+public:
+    OctreeComplete( const uint32_t levels )
+        : _levels( levels )
+    {
+        _cubes.reset( new std::vector< iv::index_node_t >[ levels ] );
+    }
+
+    void addCube( const iv::index_node_t id, const uint32_t level )
+    {
+        const uint32_t size = _cubes[ level ].size();
+        // Firts
+        if( size == 0 )
+        {
+            _cubes[ level ].push_back( id );
+            _cubes[ level ].push_back( id );
+        }
+        else if( _cubes[ level ].back() == (id - (iv::index_node_t)1 ) )
+        {
+            _cubes[ level ][ size - 1 ] = id;
+        }
+        else if( _cubes[level].back() == id )
+        {
+            //std::cout<<"repetido in level "<<level<<" "<< id <<std::endl;
+        }
+        else if( _cubes[level].back() > id )
+        {
+            std::cout << "=======>   ERROR: insert index in order "
+                      << id << " (in level " << level<< ") last inserted "
+                      << _cubes[ level ].back() << std::endl;
+            throw;
+        }
+        else
+        {
+            _cubes[level].push_back(id);
+            _cubes[level].push_back(id);
+        }
+    }
+
+    void addCubes( const std::vector< iv::index_node_t >& cubes, const uint32_t n )
+    {
+        iv::index_node_t maxid = 0;
+        for( uint32_t i = 0; i < n * 2; i+= 2 )
+        {
+            const iv::index_node_t minID = cubes[ i ];
+            const iv::index_node_t maxID = cubes[ i + 1 ];
+            for( auto idC = minID; idC <= maxID; idC++ )
+            {
+                iv::index_node_t id = idC;
+                if( id < maxid )
+                {
+                    std::cout << "======" << minID << " " << maxID << std::endl;
+                    return;
+                }
+                maxid = id;
+                for( int32_t l = _levels - 1; l >= 0; l--)
+                {
+                    id >>= 3;
+                    addCube( id, l );
+                }
+            }
+        }
+    }
+
+    const uint32_t                                          _levels;
+    std::unique_ptr< std::vector< iv::index_node_t >[] >    _cubes;
+};
+
+}
+
 namespace iv
 {
 
@@ -70,8 +144,12 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
         constructors[i].reset( new OctreeConstructor( _constructorLevel,
                                                       cubes[i] ) );
 
+    bool wasFine = true;
     for( auto c = constructors.begin(); c != constructors.end(); ++c )
-        (*c)->compute();
+        wasFine &= (*c)->compute();
+
+    if( !wasFine )
+        return false;
 
     // Collect octreeStatistics
     for( auto c = constructors.begin(); c != constructors.end(); ++c )
@@ -83,10 +161,14 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
         _stats.incSortingTime( (*c)->getStats().getSortingTime() );
     }
 
+    uint32_t maxRanges = 0;
     uint32_t numRanges = 0;
     uint32_t maxHeight = 0;
     for( auto c = constructors.begin(); c != constructors.end(); ++c )
     {
+        maxRanges = maxRanges > (*c)->getData()->getNumRanges()
+                        ? maxRanges
+                        : (*c)->getData()->getNumRanges();
         numRanges += (*c)->getData()->getNumRanges();
         maxHeight = (*c)->getData()->getMaxHeight() > maxHeight
                         ? (*c)->getData()->getMaxHeight()
@@ -98,24 +180,46 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
 
     level_t nLevels = global.getnLevels();
     level_t level = global.getOctreeLevel();
-    const uint32_t cubeInc = global.getCubeInc();
+    const uint32_t numIsos = global.getIsosurfaces().size() ;
     file.write( (char*)&nLevels, sizeof( nLevels ) );
     file.write( (char*)&level, sizeof( level ) );
     file.write( (char*)&maxHeight, sizeof( maxHeight ) );
-    file.write( (char*)&cubeInc, sizeof( cubeInc ) );
+    file.write( (char*)&numIsos, sizeof( numIsos ) );
+    for( auto i = global.getIsosurfaces().begin();
+              i != global.getIsosurfaces().end();
+              ++i )
+    {
+        const float iso = *i;
+        file.write( (char*)&iso, sizeof( iso ) );
+    }
+
+    // Write number of number of last level ranges
     file.write( (char*)&numRanges, sizeof( numRanges ) );
 
+    OctreeComplete OC( nLevels );
+    std::vector< index_node_t > data;
+    data.reserve( maxRanges * 2 );
     for( auto c = constructors.begin(); c != constructors.end(); ++c )
     {
         const uint32_t numR = (*c)->getData()->getNumRanges();
         const std::string file_name = (*c)->getData()->getFileData();
-        std::vector< index_node_t > data;
-        data.reserve( 2 * numR );
         std::ifstream fileB;
         fileB.open( file_name.c_str(), std::ifstream::binary );
-        fileB.read( (char*)data.data(), 2 * numR *sizeof( index_node_t ) );
+        fileB.read( (char*)data.data(), 2 * numR * sizeof( index_node_t ) );
         fileB.close();
-        file.write( (char*)data.data(), 2 * numR *sizeof( index_node_t ) );
+
+        OC.addCubes( data, numR );
+        file.write( (char*)data.data(), 2 * numR * sizeof( index_node_t ) );
+    }
+
+    for( int32_t l = nLevels - 1; l>=0; l-- )
+    {
+       const std::vector< index_node_t >& v = OC._cubes[l];
+       assert( OC._cubes[l].size() % 2 == 0 );
+       const uint32_t nR = OC._cubes[l].size() / 2;
+       // Write number of number ranges
+       file.write( (char*)&nR, sizeof( nR ) );
+       file.write( (char*)v.data(), 2 * nR * sizeof( index_node_t ) );
     }
 
     file.close();

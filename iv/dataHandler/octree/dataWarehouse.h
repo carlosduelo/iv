@@ -75,7 +75,8 @@ private:
                         std::vector< index_node_t >& vector,
                         const uint32_t dim );
 
-    void _sortVector( std::vector< index_node_t >& vector );
+    void _sortVector( std::vector< index_node_t >& vector,
+                      const uint32_t dim );
 
     void _vectorToFile( std::ofstream& file,
                         const std::vector< index_node_t >& vector,
