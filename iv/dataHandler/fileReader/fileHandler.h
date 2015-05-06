@@ -36,9 +36,15 @@ public:
     FileHandler(const FileHandler&) = delete; // deleted
     FileHandler& operator = (const FileHandler&) = delete; // deleted
 
-    virtual ~FileHandler() {}
+    virtual ~FileHandler() { }
 
     virtual bool init( const file_args_t& file_params ) = 0;
+
+    void close( )
+    {
+        if( _isOpen )
+            _close();
+    }
 
     virtual const float * getxGrid( ) const = 0;
     virtual const float * getyGrid( ) const = 0;
@@ -76,17 +82,6 @@ public:
         return _nLevels;
     }
 
-    class FileCloser
-    {
-    public:
-        void operator()(FileHandler* f)
-        {
-            if( f )
-                f->close();
-            delete f;
-        }
-    };
-
 protected:
 
     virtual void _close( ) = 0;
@@ -94,15 +89,8 @@ protected:
     bool        _isOpen;
     vec3int32_t _realDimension;
     level_t     _nLevels;
-private:
-    void close( )
-    {
-        if( _isOpen )
-            _close();
-    }
 };
 
-typedef std::unique_ptr< FileHandler, FileHandler::FileCloser > FileHandlerPtr;
 }
 
 }

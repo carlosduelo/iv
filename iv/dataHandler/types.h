@@ -34,6 +34,8 @@ typedef std::vector< std::string >  file_args_t;
 typedef uint32_t                    cache_type_t;
 typedef uint32_t                    cube_cache_impl_t;
 
+class FileHandler;
+
 class Cache;
 class CacheAttr;
 class CubeCache;
@@ -45,10 +47,13 @@ class ObjectHandler;
 class OctreeGenAttr;
 class OctreeGen;
 class OctreeConstructorAttr;
+
 class OctreeConstructor;
 class Worker;
 class DataWarehouse;
 class Octree;
+
+typedef std::shared_ptr< FileHandler > FileHandlerPtr;
 
 typedef std::shared_ptr< Cache >            CachePtr;
 typedef std::shared_ptr< CacheAttr >        CacheAttrPtr;
