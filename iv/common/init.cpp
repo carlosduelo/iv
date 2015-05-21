@@ -59,7 +59,6 @@ bool IV::init( const int ac, char ** av )
     boost::program_options::options_description behaviorOptions("Behavior options");
     behaviorOptions.add_options()
     ("disable_cuda", "Disable cuda, by default enabled if available")
-    ("use_hyperthreading", "Set use hyperthreading, by default disabled")
     ("max_num_threads", boost::program_options::value< uint32_t >(),
         "Select maximum number of threads")
     ;
@@ -127,8 +126,6 @@ bool IV::init( const int ac, char ** av )
     if( !vm.count( "disable_cuda" ) )
         global.useCuda();
 #endif
-    if( vm.count( "use_hyperthreading" ) )
-        global.setHyperThreading();
 
     if( vm.count( "max_num_threads" ) )
     {

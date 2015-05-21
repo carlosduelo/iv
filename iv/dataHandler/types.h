@@ -38,6 +38,7 @@ class FileHandler;
 
 class Cache;
 class CacheAttr;
+class CacheStats;
 class CubeCache;
 class ControlCache;
 class CacheObject;
@@ -57,6 +58,7 @@ typedef std::shared_ptr< FileHandler > FileHandlerPtr;
 
 typedef std::shared_ptr< Cache >            CachePtr;
 typedef std::shared_ptr< CacheAttr >        CacheAttrPtr;
+typedef std::unique_ptr< CacheStats >       CacheStatsPtr;
 typedef std::unique_ptr< ControlCache >     ControlCachePtr;
 typedef std::shared_ptr< CacheObject >      CacheObjectPtr;
 typedef std::unique_ptr< LRULinkedList >    LRULinkedListPtr;

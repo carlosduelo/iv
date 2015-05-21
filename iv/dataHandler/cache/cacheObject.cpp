@@ -9,6 +9,8 @@ Notes:
 #include <iv/dataHandler/cache/cacheObject.h>
 
 #include <iv/dataHandler/cache/objectHandler.h>
+#include <iv/dataHandler/cache/cacheStats.h>
+#include <iv/common/mortonCodeUtil_CPU.h>
 
 namespace iv
 {
@@ -24,8 +26,17 @@ CacheObject::CacheObject( const index_node_t id,
     , _id( id )
     , _lockCallback( lockCallback )
     , _unlockCallback( unlockCallback )
-
+    , _miss( 0 )
+    , _hits( 0 )
+    , _resolveTime( new std::vector< std::chrono::nanoseconds > )
 {}
+
+CacheObject::~CacheObject( )
+{
+    CacheStatsPtr& stats = CacheStats::getInstance();
+
+    stats->newStat( getIndexLevel( getID() ), getID(), _miss, _hits, _resolveTime );
+}
 
 index_node_t CacheObject::getID() const
 {
@@ -43,8 +54,12 @@ const float* CacheObject::try_lock()
     std::unique_lock< std::mutex > mlock( _mutex );
 
     if( !_data.isValid() || _state != CACHED )
+    {
+        _miss++;
         return 0;
+    }
 
+    _hits++;
     _lockCallback( this );
     return _data.get();
 }
@@ -53,11 +68,28 @@ const float* CacheObject::lock()
 {
     std::unique_lock< std::mutex > mlock( _mutex );
 
+    bool miss = false;
+    if( !_data.isValid() || _state != CACHED )
+    {
+        _miss++;
+        miss = true;
+    }
+    auto startC = std::chrono::high_resolution_clock::now();
+
     while( !_data.isValid() && _state != CACHED  && _state != INVALID )
         _condState.wait( mlock );
 
+    auto endC = std::chrono::high_resolution_clock::now();
+
     if( _state == INVALID )
         return 0;
+
+    if( miss )
+        _resolveTime->push_back( std::chrono::duration_cast<
+                                                std::chrono::milliseconds>(
+                                                    endC - startC ) );
+    else
+        _hits++;
 
     _lockCallback( this );
     return _data.get();

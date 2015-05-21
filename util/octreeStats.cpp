@@ -77,14 +77,14 @@ void octreeStats()
         totalSize += sizes[l];
     }
 
-    const size_t sizeIso = totalCubes * sizeof( index_node_t ) / 1024.0 / 1024.0;
-    const size_t sizeOctree = totalSize * sizeof( index_node_t ) / 1024.0 / 1024.0;
+    const size_t sizeIso = totalCubes * sizeof( index_node_t );
+    const size_t sizeOctree = totalSize * sizeof( index_node_t );
     std::cout << std::endl;
     std::cout << "Size of octree "
-              << sizeOctree
+              << sizeOctree / 1024.0 / 1024.0
               << " MB"
               << ", total cubes "
-              << sizeIso
+              << sizeIso / 1024.0 / 1024.0
               << " MB" << std::endl;
     std::cout << "Compresion " << ( sizeOctree * 100 ) / sizeIso << "%"
               << std::endl;

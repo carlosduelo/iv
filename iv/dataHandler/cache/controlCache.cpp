@@ -9,6 +9,7 @@ Notes:
 #include <iv/dataHandler/cache/controlCache.h>
 
 #include <iv/dataHandler/cache/cacheAttr.h>
+#include <iv/dataHandler/cache/cacheStats.h>
 #include <iv/dataHandler/cache/cacheObject.h>
 #include <iv/dataHandler/cache/objectHandler.h>
 #include <iv/dataHandler/fileReader/factoryFileHandler.h>
@@ -65,6 +66,8 @@ void ControlCache::stop()
     _cubesTable.clear();
     _toReadThread->join();
     _lruList->stop();
+
+     CacheStats::getInstance()->printStats();
 
     _stop();
 }

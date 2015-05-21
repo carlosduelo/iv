@@ -98,43 +98,42 @@ bool OctreeConstructor::compute()
         return false;
 
     bool wasFine = true;
-    if( global.useHyperThreading() )
+    uint32_t numCubes = 0;
+    for( index_node_t id = idStart; id <= idFinish; id++ )
     {
-        uint32_t worker = 0;
-        for( index_node_t id = idStart; id <= idFinish; id++ )
-        {
-            // Check cube is outside of volume
-            vec3int32_t coordCubeStart = getMinBoxIndex2( id,
-                                                          readLevel,
-                                                          global.getnLevels() );
+        // Check cube is outside of volume
+        vec3int32_t coordCubeStart = getMinBoxIndex2( id,
+                readLevel,
+                global.getnLevels() );
 
-            if( coordCubeStart.x() < cache->getRealDimension().x()  &&
-                coordCubeStart.y() < cache->getRealDimension().y()  &&
-                coordCubeStart.z() < cache->getRealDimension().z() )
-            {
-#ifdef IV_USE_CUDA
-                if( global.useCuda() )
-                    _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
-                                                                  cache,
-                                                                  readLevel,
-                                                                  _stats ) ) );
-                else
-#endif
-                    _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
-                                                                  cache,
-                                                                  readLevel,
-                                                                  _stats ) ) );
-                _workers[ worker ]->addCube( id );
-                worker++;
-            }
+        if( coordCubeStart.x() < cache->getRealDimension().x()  &&
+            coordCubeStart.y() < cache->getRealDimension().y()  &&
+            coordCubeStart.z() < cache->getRealDimension().z() )
+        {
+            numCubes++;
         }
     }
-    else
+
+    uint32_t eachThread = numCubes / global.getMaxNumThreads();
+    index_node_t id = idStart;
+    uint32_t worker = 0;
+    while( id <= idFinish )
     {
-        uint32_t numCubes = 0;
-        for( index_node_t id = idStart; id <= idFinish; id++ )
+#ifdef IV_USE_CUDA
+        if( global.useCuda() )
+            _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
+                                                          cache,
+                                                          readLevel,
+                                                          _stats ) ) );
+#endif
+        else
+            _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
+                                                          cache,
+                                                          readLevel,
+                                                          _stats ) ) );
+        uint32_t cubes = 0;
+        while( cubes <= eachThread && id <= idFinish )
         {
-            // Check cube is outside of volume
             vec3int32_t coordCubeStart = getMinBoxIndex2( id,
                     readLevel,
                     global.getnLevels() );
@@ -143,45 +142,12 @@ bool OctreeConstructor::compute()
                 coordCubeStart.y() < cache->getRealDimension().y()  &&
                 coordCubeStart.z() < cache->getRealDimension().z() )
             {
-                numCubes++;
+                cubes++;
+                _workers[ worker ]->addCube( id );
             }
+            id++;
         }
-
-        uint32_t eachThread = numCubes / global.getMaxNumThreads();
-        index_node_t id = idStart;
-        uint32_t worker = 0;
-        while( id <= idFinish )
-        {
-#ifdef IV_USE_CUDA
-            if( global.useCuda() )
-                _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
-                                                              cache,
-                                                              readLevel,
-                                                              _stats ) ) );
-#endif
-            else
-                _workers.push_back( WorkerPtr( new WorkerCPU( _dataWarehouse,
-                                                              cache,
-                                                              readLevel,
-                                                              _stats ) ) );
-            uint32_t cubes = 0;
-            while( cubes <= eachThread && id <= idFinish )
-            {
-                vec3int32_t coordCubeStart = getMinBoxIndex2( id,
-                        readLevel,
-                        global.getnLevels() );
-
-                if( coordCubeStart.x() < cache->getRealDimension().x()  &&
-                    coordCubeStart.y() < cache->getRealDimension().y()  &&
-                    coordCubeStart.z() < cache->getRealDimension().z() )
-                {
-                    cubes++;
-                    _workers[ worker ]->addCube( id );
-                }
-                id++;
-            }
-            worker++;
-        }
+        worker++;
     }
 
     for( uint32_t w = 0; w < _workers.size() && wasFine; w++ )

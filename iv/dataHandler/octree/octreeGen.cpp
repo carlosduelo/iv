@@ -135,6 +135,12 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
         return false;
     }
 
+    if( global.getFileType() != IV_FILE_TYPE_HDF5 )
+    {
+        std::cerr << "Provide hdf5 file" << std::endl;
+        return false;
+    }
+
     // Sort cubes
     std::sort( cubes.begin(), cubes.end() );
 

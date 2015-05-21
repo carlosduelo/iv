@@ -23,6 +23,7 @@ set(IV_SOURCES
     dataHandler/cache/cubeCacheFactory.cpp
     dataHandler/cache/cubeCacheSimple.cpp
     dataHandler/cache/cache.cpp
+    dataHandler/cache/cacheStats.cpp
     dataHandler/octree/worker.cpp
     dataHandler/octree/workerCPU.cpp
     dataHandler/octree/dataWarehouse.cpp

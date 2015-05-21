@@ -13,6 +13,7 @@ Notes:
 #include <iv/dataHandler/types.h>
 #include <iv/dataHandler/util/lruLinkedList.h>
 
+#include <chrono>
 #include <memory>
 #include <condition_variable>
 #include <functional>
@@ -28,6 +29,9 @@ class CacheObject;
 class CacheObject : public std::enable_shared_from_this< CacheObject >
 {
 public:
+
+    ~CacheObject( );
+ 
     const float* try_lock();
 
     const float* lock();
@@ -69,6 +73,11 @@ private:
     std::mutex              _mutex;
     std::condition_variable _condState;
     std::condition_variable _condRefs;
+
+    // Stats
+    uint32_t                    _miss;
+    uint32_t                    _hits;
+    std::shared_ptr< std::vector< std::chrono::nanoseconds >  > _resolveTime;
 };
 
 }

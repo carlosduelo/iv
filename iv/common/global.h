@@ -29,7 +29,6 @@ private:
         , _cacheSizeGPU( 128 ) // 128 MB
         , _useCuda( false )
         , _maxNumThreads( 8 )
-        , _hyperThreading( false )
         , _file_type( 0 )
         , _nLevels( 0 )
         , _cubeLevel( 0 )
@@ -64,9 +63,6 @@ public:
 
     void setMaxNumThreads( const uint32_t threads ){ _maxNumThreads = threads; }
     uint32_t getMaxNumThreads() const { return _maxNumThreads; }
-
-    void setHyperThreading() { _hyperThreading = true; }
-    bool useHyperThreading() const { return _hyperThreading; }
 
     void setFileType( const DataHandler::file_type_t file_type ){ _file_type = file_type; }
     DataHandler::file_type_t getFileType() const { return _file_type; }
@@ -114,7 +110,6 @@ private:
     bool        _useCuda;
 
     uint32_t    _maxNumThreads;
-    bool        _hyperThreading;
 
     // File attributes
     DataHandler::file_type_t _file_type;
