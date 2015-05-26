@@ -11,12 +11,93 @@ Notes:
 #include <iv/common/init.h>
 #include <iv/common/mortonCodeUtil_CPU.h>
 
-#include <iv/dataHandler/octree/octreeConstructor.h>
+#include <iv/dataHandler/types.h>
+#include <iv/dataHandler/fileReader/factoryFileHandler.h>
+#include <iv/dataHandler/octree/dataWarehouse.h>
 
 #include <algorithm>
+#include <thread>
+#include <chrono>
+
+#include <omp.h>
+
+#include <boost/progress.hpp>
 
 namespace
 {
+
+inline bool checkIsosurface( const float xyz,
+                             const float xyz1,
+                             const float xy1z,
+                             const float xy1z1,
+                             const float x1yz,
+                             const float x1yz1,
+                             const float x1y1z,
+                             const float x1y1z1,
+                             const float iso )
+{
+    const bool sign = ( xyz - iso ) < 0;
+
+    if( ( ( xyz1 - iso ) < 0 ) != sign )
+       return true;
+    if( ( ( xy1z - iso ) < 0 ) != sign )
+       return true;
+    if( ( ( xy1z1 - iso ) < 0 ) != sign )
+       return true;
+    if( ( ( x1yz - iso ) < 0 ) != sign )
+       return true;
+    if( ( ( x1yz1 - iso ) < 0 ) != sign )
+       return true;
+    if( ( ( x1y1z - iso ) < 0 ) != sign )
+       return true;
+    if( ( ( x1y1z1 - iso ) < 0 ) != sign )
+        return true;
+
+    return false;
+}
+
+class PlaneReader
+{
+public:
+    bool init()
+    {
+        const iv::Global& global = iv::IV::getGlobal();
+        _file = iv::DataHandler::FactoryFileHandler::CreateFileHandler(
+                                                        global.getFileType(),
+                                                        global.getFileArgs() );
+        if( !_file )
+            return false;
+        return true;
+    }
+
+    const iv::vec3int32_t& getDimension()
+    {
+        return _file->getRealDimension();
+    }
+
+    void readPlane( float* plane, const uint32_t x )
+    {
+        _thread  = std::thread( &PlaneReader::_readPlane, this, plane, x );
+    }
+
+    void wait( )
+    {
+        if( _thread.joinable() )
+            _thread.join();
+    }
+
+private:
+    void _readPlane( float* plane, const uint32_t x )
+    {
+        const iv::vec3int32_t& dimension = _file->getRealDimension();
+        _file->read( plane,
+                     iv::vec3int32_t( x, 0, 0 ),
+                     iv::vec3int32_t( x + 1, dimension.y(), dimension.z() ) );
+    }
+
+    iv::DataHandler::FileHandlerPtr _file;
+    std::thread                     _thread;
+};
 
 class OctreeComplete
 {
@@ -95,32 +176,8 @@ namespace iv
 namespace DataHandler
 {
 
-void OctreeGen::printStats() const
+bool OctreeGen::compute( )
 {
-    std::cout << "Octree Construction Stats:" << std::endl;
-    std::cout << "\tData read: " << _stats.getBytesRead() / 1024.0 / 1024.0
-              << " MB" << std::endl;
-    std::cout << "\tCubes computed: " << _stats.getCubesComputed() << std::endl;
-    std::cout << "\tTime Reading: " << _stats.getReadingTime().count() /
-                                       1000.0
-              << " sec" << std::endl;
-    std::cout << "\tBandwidth: "
-              << ( _stats.getBytesRead() / 1024.0 / 1024.0 ) /
-                 ( _stats.getReadingTime().count() / 1000.0 )
-              << " MB/s" << std::endl;
-    std::cout << "\tTime Computing: " << _stats.getComputingTime().count() /
-                                         1000.0
-              << " sec" << std::endl;
-    std::cout << "\tTime Sorting: " << _stats.getSortingTime().count() /
-                                       1000.0
-              << " sec" << std::endl;
-}
-
-bool OctreeGen::compute( std::vector< index_node_t >& cubes )
-{
-    if( cubes.size() == 0 )
-        return false;
-
     const Global& global = IV::getGlobal();
 
     if( global.getOctreeFile() == "" )
@@ -141,45 +198,96 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
         return false;
     }
 
-    // Sort cubes
-    std::sort( cubes.begin(), cubes.end() );
 
-    std::vector< OctreeConstructorPtr > constructors;
-    constructors.resize( cubes.size() );
-    for( uint32_t i = 0; i < cubes.size(); i++ )
-        constructors[i].reset( new OctreeConstructor( _constructorLevel,
-                                                      cubes[i] ) );
-
-    bool wasFine = true;
-    for( auto c = constructors.begin(); c != constructors.end(); ++c )
-        wasFine &= (*c)->compute();
-
-    if( !wasFine )
+    // Init DataWarehouse
+    const index_node_t min = ( index_node_t ) 1 << 3 * global.getOctreeLevel();
+    const index_node_t max = ( ( index_node_t ) 2 << 3 * global.getOctreeLevel() ) - 1;
+    DataWarehousePtr dataWarehouse( new DataWarehouse( min, max ) ); 
+    if( !dataWarehouse->start() )
+    {
+        std::cout << "Error init DataWarehouse" << std::endl;
         return false;
-
-    // Collect octreeStatistics
-    for( auto c = constructors.begin(); c != constructors.end(); ++c )
-    {
-        _stats.incReadBytes( (*c)->getStats().getBytesRead() );
-        _stats.incCube( (*c)->getStats().getCubesComputed() );
-        _stats.incReadingTime( (*c)->getStats().getReadingTime() );
-        _stats.incComputingTime( (*c)->getStats().getComputingTime() );
-        _stats.incSortingTime( (*c)->getStats().getSortingTime() );
     }
 
-    uint32_t maxRanges = 0;
-    uint32_t numRanges = 0;
-    uint32_t maxHeight = 0;
-    for( auto c = constructors.begin(); c != constructors.end(); ++c )
+    PlaneReader planeReader;
+    planeReader.init();
+
+    const iv::vec3int32_t& dimension = planeReader.getDimension();
+
+    float* plane0 = new float[ dimension.y() * dimension.z() ];
+    float* plane1 = new float[ dimension.y() * dimension.z() ];
+    float* plane2 = new float[ dimension.y() * dimension.z() ];
+    planeReader.readPlane( plane1, 0 );
+    planeReader.wait();
+    planeReader.readPlane( plane2, 1 );
+
+    std::cout << "Reading volume and computing isosurface" << std::endl;
+    auto startC = std::chrono::high_resolution_clock::now();
+    boost::progress_display show_progress( dimension.x() );
+    int32_t plane = 0;
+    int32_t timeComputing = 0;
+    do
     {
-        maxRanges = maxRanges > (*c)->getData()->getNumRanges()
-                        ? maxRanges
-                        : (*c)->getData()->getNumRanges();
-        numRanges += (*c)->getData()->getNumRanges();
-        maxHeight = (*c)->getData()->getMaxHeight() > maxHeight
-                        ? (*c)->getData()->getMaxHeight()
-                        : maxHeight;
-    }
+        // Reading next plane
+        planeReader.wait();
+        float* aux = plane0;
+        plane0 = plane1;
+        plane1 = plane2;
+        plane2 = aux;
+        planeReader.readPlane( plane2, plane + 2 );
+
+        auto startCC = std::chrono::high_resolution_clock::now();
+        #pragma omp parallel for
+        for( int32_t y = 0; y < dimension.y() - 1; y++ )
+        {
+            for( int32_t z = 0; z < dimension.z() - 1; z++ )
+            {
+                for( auto iso = global.getIsosurfaces().begin();
+                          iso != global.getIsosurfaces().end();
+                          iso++ )
+                {
+                    if( checkIsosurface( plane0[ y * dimension.z() + z ],
+                                         plane0[ y * dimension.z() + ( z + 1 ) ],
+                                         plane0[ ( y + 1 ) * dimension.z() + z ],
+                                         plane0[ ( y + 1 ) * dimension.z() + ( z + 1 ) ],
+                                         plane1[ y * dimension.z() + z ],
+                                         plane1[ y * dimension.z() + ( z + 1 ) ],
+                                         plane1[ ( y + 1 )* dimension.z() + z ],
+                                         plane1[ ( y + 1 )* dimension.z() + ( z + 1 ) ],
+                                         *iso ) )
+                    {
+                        const index_node_t id = coordinateToIndex( vec3int32_t( plane, y, z ),
+                                                                   global.getOctreeLevel(),
+                                                                   global.getnLevels() );
+                        dataWarehouse->pushCube( id );
+                        dataWarehouse->updateMaxHeight( y + 1 );
+                        break;
+                    }
+                }
+            }
+        }
+        auto endCC = std::chrono::high_resolution_clock::now();
+        timeComputing += std::chrono::duration_cast< std::chrono::milliseconds>( endCC - startCC ).count();
+
+
+        plane++;
+        show_progress += 1;
+    } while( plane < dimension.x() - 1 );
+    planeReader.wait();
+    auto endC = std::chrono::high_resolution_clock::now();
+
+    auto timeC = std::chrono::duration_cast< std::chrono::milliseconds>( endC - startC );
+    std::cout << timeC.count() << std::endl;
+    std::cout << timeComputing << std::endl;
+
+    dataWarehouse->wait();
+
+    delete[] plane0;
+    delete[] plane1;
+    delete[] plane2;
+
+    const uint32_t numRanges = dataWarehouse->getRanges().size() / 2;
+    const uint32_t maxHeight = dataWarehouse->getMaxHeight();
 
     // Write to file
     std::ofstream file( global.getOctreeFile().c_str(), std::ofstream::binary );
@@ -203,20 +311,9 @@ bool OctreeGen::compute( std::vector< index_node_t >& cubes )
     file.write( (char*)&numRanges, sizeof( numRanges ) );
 
     OctreeComplete OC( nLevels );
-    std::vector< index_node_t > data;
-    data.reserve( maxRanges * 2 );
-    for( auto c = constructors.begin(); c != constructors.end(); ++c )
-    {
-        const uint32_t numR = (*c)->getData()->getNumRanges();
-        const std::string file_name = (*c)->getData()->getFileData();
-        std::ifstream fileB;
-        fileB.open( file_name.c_str(), std::ifstream::binary );
-        fileB.read( (char*)data.data(), 2 * numR * sizeof( index_node_t ) );
-        fileB.close();
 
-        OC.addCubes( data, numR );
-        file.write( (char*)data.data(), 2 * numR * sizeof( index_node_t ) );
-    }
+    OC.addCubes( dataWarehouse->getRanges(), numRanges );
+    file.write( (char*)dataWarehouse->getRanges().data(), 2 * numRanges * sizeof( index_node_t ) );
 
     for( int32_t l = nLevels - 1; l>=0; l-- )
     {

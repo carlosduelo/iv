@@ -9,6 +9,10 @@ Notes:
 #ifndef _IV_OCTREE_DATAWAREHOUSE_H_
 #define _IV_OCTREE_DATAWAREHOUSE_H_
 
+#include <iv/common/types.h>
+
+#include <iv/dataHandler/util/queue.hpp>
+
 #include <thread>
 #include <fstream>
 #include <unordered_map>
@@ -29,7 +33,6 @@ public:
         , _endRange( 0 )
         , _startRange( 0 )
         , _numRanges( 0 )
-        , _nameEndFile( "" )
     {
     }
 
@@ -42,7 +45,7 @@ public:
     void pushCube( const index_node_t id );
     void updateMaxHeight( const uint32_t h );
 
-    const std::string getFileData() const { return _nameEndFile; }
+    const std::vector< index_node_t>& getRanges() const { return _ranges; }
     uint32_t getMaxHeight() const { return _maxHeight; }
     uint32_t getNumRanges() const { return _numRanges; }
 
@@ -58,12 +61,10 @@ private:
     index_node_t            _startRange;
     index_node_t            _numRanges;
 
-    std::vector< index_node_t >                         _indices;
-    std::vector< uint32_t >                             _dimensions;
-    std::vector< std::shared_ptr< std::ofstream > >     _tmpFiles;
-    std::vector< std::string >                          _nameTmpFiles;
+    std::vector< index_node_t >                                     _indices;
+    std::vector< std::unique_ptr< std::vector< index_node_t > > >   _data;
 
-    std::string     _nameEndFile;
+    std::vector< index_node_t > _ranges;
 
     void _run( );
 
@@ -71,16 +72,7 @@ private:
 
     void _sort();
 
-    void _fileToVector( std::ifstream& file,
-                        std::vector< index_node_t >& vector,
-                        const uint32_t dim );
-
-    void _sortVector( std::vector< index_node_t >& vector,
-                      const uint32_t dim );
-
-    void _vectorToFile( std::ofstream& file,
-                        const std::vector< index_node_t >& vector,
-                        const uint32_t dim );
+    void _vectorToRanges( const std::unique_ptr< std::vector< index_node_t > >& vector );
 };
 
 }

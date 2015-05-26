@@ -45,6 +45,9 @@ set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread" )
 # Definitions
 add_definitions(${IV_DEFINITIONS})
 
+# OpenMP
+find_package( OpenMP )
+
 include(configure)
 
 # Compile libraries

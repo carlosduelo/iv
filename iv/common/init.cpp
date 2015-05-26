@@ -84,8 +84,6 @@ bool IV::init( const int ac, char ** av )
         "Select brick cache size in MB")
     ("octree_file", boost::program_options::value< std::string >(),
         "Octree file")
-    ("octree_level", boost::program_options::value< level_t >(),
-        "Select octree level, by default equal to nLevels")
     ("isos", boost::program_options::value< std::vector< float > >()->multitoken(),
         "Set of Isosurfaces")
     ;
@@ -224,10 +222,7 @@ bool IV::init( const int ac, char ** av )
         global.setOctreeFile( vm["octree_file"].as< std::string >() );
 
 
-    if( vm.count( "octree_level" ) )
-         global.setOctreeLevel( vm["octree_level"].as< level_t >() );
-    else // By default nLevels
-         global.setOctreeLevel( nLevels );
+     global.setOctreeLevel( nLevels );
 
     if( vm.count( "isos" ) )
     {

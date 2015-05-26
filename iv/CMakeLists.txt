@@ -24,10 +24,7 @@ set(IV_SOURCES
     dataHandler/cache/cubeCacheSimple.cpp
     dataHandler/cache/cache.cpp
     dataHandler/cache/cacheStats.cpp
-    dataHandler/octree/worker.cpp
-    dataHandler/octree/workerCPU.cpp
     dataHandler/octree/dataWarehouse.cpp
-    dataHandler/octree/octreeConstructor.cpp
     dataHandler/octree/octreeGen.cpp
     dataHandler/octree/octree.cpp
     )
@@ -49,6 +46,12 @@ if(CUDA_FOUND)
         )
 
     include_directories( ${CUDA_INCLUDE_DIRS} )
+endif()
+
+if(OPENMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
 #list(SORT IV_PUBLIC_HEADERS)
