@@ -8,9 +8,9 @@ Notes:
 
 #include <iv/dataHandler/octree/dataWarehouse.h>
 
-#include <algorithm>
+#include <iv/common/init.h>
 
-#define MAX_ELEM 12 * 1024 * 1024 // ~100MB
+#include <algorithm>
 
 namespace iv
 {
@@ -25,119 +25,94 @@ DataWarehouse::~DataWarehouse()
 
 bool DataWarehouse::start()
 {
-    // Create Files
-    index_node_t current = _min;
-    while( current <= _max )
-    {
-        _indices.push_back( current );
-        std::unique_ptr< std::vector< index_node_t > > ptr(
-                                        new std::vector< index_node_t > );
-        _data.push_back( std::move( ptr )  );
+    uint64_t n = ( uint64_t ) _dim.x() *
+                 ( uint64_t ) _dim.y() *
+                 ( uint64_t ) _dim.z();
 
-        current += MAX_ELEM; // ~100 MB
-    }
+    if( n % 8 > 0 )
+        n = ( n / 8 ) + 1;
+    else
+        n = n / 8;
 
-    _queue.start();
-    _thread = std::thread( &DataWarehouse::_run, this );
+    _data.reset( new char[ n ] );
     return true;
 }
 
-void DataWarehouse::wait()
+void DataWarehouse::write( )
 {
-    _queue.push(0);
-    _queue.stop();
-    if( _thread.joinable() )
-        _thread.join();
+    const Global& global = IV::getGlobal();
 
+    std::ofstream file( global.getOctreeFile().c_str(), std::ofstream::binary );
+
+    level_t nLevels = global.getnLevels();
+    level_t level = global.getOctreeLevel();
+    const uint32_t numIsos = global.getIsosurfaces().size() ;
+    file.write( (char*)&nLevels, sizeof( nLevels ) );
+    file.write( (char*)&level, sizeof( level ) );
+    file.write( (char*)&_maxHeight, sizeof( _maxHeight ) );
+    file.write( (char*)&numIsos, sizeof( numIsos ) );
+    for( auto i = global.getIsosurfaces().begin();
+              i != global.getIsosurfaces().end();
+              ++i )
+    {
+        const float iso = *i;
+        file.write( (char*)&iso, sizeof( iso ) );
+    }
+
+    file.close();
     // Sort
-    _sort();
+//    _sort();
+    
 }
 
-void DataWarehouse::pushCube( const index_node_t id )
+void DataWarehouse::pushCube( const uint32_t x, const uint32_t y, const uint32_t z )
 {
-    _queue.push( id );
+    std::unique_lock< std::mutex > rlock( _mutex );
+
+    if( y > _maxHeight )
+        _maxHeight = y;
+
+    uint64_t byte = ( uint64_t ) ( x * _dim.y() * _dim.z() ) +
+                    ( uint64_t ) ( y * _dim.z() ) +
+                    ( uint64_t ) z;
+
+    uint32_t bit = byte % 8;
+    byte = byte / 8;
+
+    _data[ byte ] = _data[ byte ] | ( (char)0x1 << bit );
 }
 
-void DataWarehouse::updateMaxHeight( const uint32_t m )
+#if 0
+void DataWarehouse::_vectorToRanges( const std::vector< index_node_t >& vector )
 {
-    std::unique_lock< std::mutex > mlock( _mutex );
-    if( m > _maxHeight )
-        _maxHeight = m;
-}
-
-void DataWarehouse::_run()
-{
-    while( 1 )
-    {
-        index_node_t id = 0;
-        _queue.pop( id );
-        if( !id )
+    if( vector.size() == 0 )
             return;
-        _addCube( id );
-    }
-}
 
-void DataWarehouse::_addCube( const index_node_t id )
-{
-    assert( id );
-    if( id < _min || id > _max )
-    {
-        std::cerr << "Warning! trying to push a cube not in range" << std::endl;
-        return;
-    }
+    index_node_t endRange = vector[0];
+    index_node_t startRange = vector[0];
 
-    for( uint32_t i = 0; i < _indices.size() - 1; i++ )
+    for( uint32_t i = 1; i < vector.size(); i++ )
     {
-        if( id >= _indices[i] && id < _indices[i+1] )
+        if( vector[i] != endRange + 1 )
         {
-            _data[i]->push_back( id );
-            return;
-        }
-    }
-
-    _data[ _indices.size() - 1 ]->push_back( id );
-}
-
-void DataWarehouse::_vectorToRanges( const std::unique_ptr< std::vector< index_node_t > >& vector )
-{
-    if( vector->size() == 0 )
-            return;
-
-    if( _startRange == 0 )
-    {
-        _endRange = (*vector)[0];
-        _startRange = (*vector)[0];
-    }
-
-    for( uint32_t i = 1; i < vector->size(); i++ )
-    {
-        if( (*vector)[i] != _endRange + 1 )
-        {
-            _ranges.push_back( _startRange );
-            _ranges.push_back( _endRange );
+            _ranges.push_back( startRange );
+            _ranges.push_back( endRange );
             _numRanges++;
-            assert( _startRange != 0 && _endRange != 0 );
-            _startRange = (*vector)[i];
+            assert( startRange != 0 && endRange != 0 );
+            startRange = vector[i];
         }
-        _endRange = (*vector)[i];
+        endRange = vector[i];
     }
 }
 
 void DataWarehouse::_sort()
 {
-
     // Sort all vectors
     std::cout << "Sorting vectors" << std::endl;
-    #pragma omp parallel for
-    for( size_t i = 0; i < _data.size(); i++ )
-        std::sort( _data[i]->begin(), _data[i]->end() );
-
-    for( size_t i = 0; i < _data.size(); i++ )
-    {
-        std::unique_ptr< std::vector< index_node_t > > ptr = std::move( _data[i] );
-        _vectorToRanges( ptr );
-    }
+    std::sort( _data.begin(), _data.end() );
+    _vectorToRanges( _data );
 }
+#endif
 
 }
 

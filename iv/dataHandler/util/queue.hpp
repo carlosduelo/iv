@@ -40,6 +40,12 @@ public:
         std::swap( _queue, empty );
     }
 
+    size_t size()
+    {
+        std::unique_lock< std::mutex > rlock( _mutex );
+        return _queue.size();
+    }
+
     void push( const T& t )
     {
         std::unique_lock< std::mutex > rlock( _mutex );

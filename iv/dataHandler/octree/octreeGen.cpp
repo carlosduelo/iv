@@ -198,21 +198,18 @@ bool OctreeGen::compute( )
         return false;
     }
 
-
     // Init DataWarehouse
-    const index_node_t min = ( index_node_t ) 1 << 3 * global.getOctreeLevel();
-    const index_node_t max = ( ( index_node_t ) 2 << 3 * global.getOctreeLevel() ) - 1;
-    DataWarehousePtr dataWarehouse( new DataWarehouse( min, max ) ); 
+    PlaneReader planeReader;
+    planeReader.init();
+
+    const iv::vec3int32_t& dimension = planeReader.getDimension();
+
+    DataWarehousePtr dataWarehouse( new DataWarehouse( dimension ) );
     if( !dataWarehouse->start() )
     {
         std::cout << "Error init DataWarehouse" << std::endl;
         return false;
     }
-
-    PlaneReader planeReader;
-    planeReader.init();
-
-    const iv::vec3int32_t& dimension = planeReader.getDimension();
 
     float* plane0 = new float[ dimension.y() * dimension.z() ];
     float* plane1 = new float[ dimension.y() * dimension.z() ];
@@ -223,13 +220,17 @@ bool OctreeGen::compute( )
 
     std::cout << "Reading volume and computing isosurface" << std::endl;
     auto startC = std::chrono::high_resolution_clock::now();
-    boost::progress_display show_progress( dimension.x() );
+    boost::progress_display show_progress( dimension.x() - 1 );
     int32_t plane = 0;
     int32_t timeComputing = 0;
+    int32_t timeWaiting = 0;
     do
     {
         // Reading next plane
+        auto startCR = std::chrono::high_resolution_clock::now();
         planeReader.wait();
+        auto endCR = std::chrono::high_resolution_clock::now();
+        timeWaiting += std::chrono::duration_cast< std::chrono::milliseconds>( endCR - startCR ).count();
         float* aux = plane0;
         plane0 = plane1;
         plane1 = plane2;
@@ -256,11 +257,7 @@ bool OctreeGen::compute( )
                                          plane1[ ( y + 1 )* dimension.z() + ( z + 1 ) ],
                                          *iso ) )
                     {
-                        const index_node_t id = coordinateToIndex( vec3int32_t( plane, y, z ),
-                                                                   global.getOctreeLevel(),
-                                                                   global.getnLevels() );
-                        dataWarehouse->pushCube( id );
-                        dataWarehouse->updateMaxHeight( y + 1 );
+                        dataWarehouse->pushCube( plane, y, z );
                         break;
                     }
                 }
@@ -279,13 +276,15 @@ bool OctreeGen::compute( )
     auto timeC = std::chrono::duration_cast< std::chrono::milliseconds>( endC - startC );
     std::cout << timeC.count() << std::endl;
     std::cout << timeComputing << std::endl;
-
-    dataWarehouse->wait();
+    std::cout << timeWaiting << std::endl;
 
     delete[] plane0;
     delete[] plane1;
     delete[] plane2;
 
+    dataWarehouse->write();
+
+#if 0
     const uint32_t numRanges = dataWarehouse->getRanges().size() / 2;
     const uint32_t maxHeight = dataWarehouse->getMaxHeight();
 
@@ -312,7 +311,10 @@ bool OctreeGen::compute( )
 
     OctreeComplete OC( nLevels );
 
+    std::cout << "Building the octree" << std::endl;
     OC.addCubes( dataWarehouse->getRanges(), numRanges );
+
+    std::cout << "Writing the octree" << std::endl;
     file.write( (char*)dataWarehouse->getRanges().data(), 2 * numRanges * sizeof( index_node_t ) );
 
     for( int32_t l = nLevels - 1; l>=0; l-- )
@@ -326,6 +328,7 @@ bool OctreeGen::compute( )
     }
 
     file.close();
+#endif
 
     return true;
 }
